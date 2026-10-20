@@ -97,6 +97,22 @@
   .spot-dot.on{background:var(--coral)}
   .pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-right:7px;animation:pulseDot 1.6s ease infinite;vertical-align:middle}
 
+
+  /* Weekend MMA rates scene */
+  .rates-dates{font-family:var(--serif);font-size:27px;font-weight:700;line-height:1.2}
+  .rates-sub{font-size:13px;color:var(--dim);margin:5px 0 16px}
+  .rate-card{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--coral);border-radius:10px;padding:13px 15px;margin-bottom:11px;opacity:0;animation:fadeUp .7s ease forwards}
+  .rate-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .rate-city{font-size:17px;font-weight:800;letter-spacing:2px}
+  .rate-tag{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .rate-steal{margin-left:auto;background:var(--coral);color:#1C1C1C;font-size:11px;font-weight:800;letter-spacing:1px;padding:3px 9px;border-radius:999px;text-transform:uppercase}
+  .rate-pick{font-size:16px;line-height:1.4;margin-top:7px}
+  .rate-pick b{font-weight:800}
+  .rate-price{font-weight:800;font-variant-numeric:tabular-nums}
+  .rate-low{font-size:13.5px;color:#44443F;line-height:1.45;margin-top:4px}
+  .rate-note{font-size:12.5px;color:var(--dim);margin-top:3px}
+  .rates-foot{font-size:11px;color:var(--dim);margin-top:auto;padding-top:10px;line-height:1.5}
+
   /* News scene */
   #newsImg{width:100%;height:230px;object-fit:cover;border-radius:12px;margin-bottom:16px;opacity:0;transition:opacity .6s ease;background:var(--panel2)}
   #newsBig{font-family:var(--serif);font-size:38px;font-weight:600;line-height:1.3;transition:opacity .6s ease}
@@ -178,6 +194,16 @@
   <!-- SCENE 1B: BRAND SPOTLIGHT (expanded tile: chart top third + 3 headlines) -->
   <section class="scene" id="scene-spotlight">
     <div id="spotBody" style="display:flex;flex-direction:column;height:100%;min-height:0"></div>
+  </section>
+
+  
+  <!-- SCENE 1C: WEEKEND MMA RATES -->
+  <section class="scene" id="scene-rates">
+    <div class="kicker">This weekend &middot; Explore Associate (MMA) rates</div>
+    <div class="rates-dates" id="ratesDates"></div>
+    <div class="rates-sub">2 nights &middot; Fri + Sat &middot; 1 room, 2 adults &middot; Marriott.com with code MMA</div>
+    <div id="ratesList"></div>
+    <div class="rates-foot" id="ratesFoot"></div>
   </section>
 
   <!-- SCENE 2: NEWS -->
@@ -529,6 +555,49 @@ function goSpot(i){renderSpotlight(i);}
 function startSpotlight(){renderSpotlight(spotCur);clearInterval(spotTimer);spotTimer=setInterval(function(){renderSpotlight(spotCur+1);},12000);}
 function stopSpotlight(){clearInterval(spotTimer);if(spotRAF)cancelAnimationFrame(spotRAF);}
 
+
+/* ---------- Weekend MMA rates (baked from live Marriott.com searches) ----------
+   Refreshed by a scheduled search before each weekend; the static page cannot
+   query Marriott.com itself. Prices are the Explore Associate (MMA) rates.
+   "Pick" = best in/near the city core. "Lowest" = cheapest all-in in the metro,
+   with its distance stated so a suburban floor price never masquerades as in-town. */
+var WEEKEND_RATES={
+  checked:'Tue Oct 20, 2026',
+  dates:'Fri Oct 23 \u2013 Sun Oct 25, 2026',
+  cities:[
+    {city:'NASHVILLE', tag:'Home base',
+     pick:{prop:'Sheraton Nashville Brentwood', area:'Brentwood \u00B7 8.4 mi to downtown', price:'$141/night \u00B7 $335 all-in'},
+     low:'Lowest in metro: Fairfield Smyrna \u2014 $123/night \u00B7 $288 all-in \u00B7 breakfast incl.',
+     note:'Downtown is pricey this weekend \u2014 from $477/night pre-tax.'},
+    {city:'GATLINBURG', tag:'4 hr drive \u00B7 Smokies',
+     pick:{prop:'Courtyard Gatlinburg Downtown', area:'In town \u00B7 0.6 mi', price:'$231/night \u00B7 $522 all-in'},
+     low:'Lowest: Fairfield Sevierville Kodak \u2014 $149/night \u00B7 $336 all-in \u00B7 19.6 mi out \u00B7 breakfast incl.'},
+    {city:'CHATTANOOGA', tag:'2 hr drive',
+     pick:{prop:'Element Chattanooga East', area:'Hamilton Place \u00B7 8.5 mi', price:'$183/night \u00B7 $429 all-in'},
+     low:'Next: Fairfield Chattanooga South/East Ridge \u2014 $186/night \u00B7 $437 all-in \u00B7 breakfast incl.',
+     note:'Downtown proper from $344/night pre-tax (Courtyard Downtown).'},
+    {city:'ATLANTA', tag:'4.5 hr drive', steal:true,
+     pick:{prop:'The Ritz-Carlton, Atlanta', area:'Downtown \u00B7 0.6 mi', price:'$280/night \u00B7 $671 all-in'},
+     low:'Lowest: Fairfield Atlanta Suwanee \u2014 $45/night \u00B7 $111 all-in for the weekend \u00B7 NE suburbs.'},
+    {city:'CHICAGO', tag:'1.5 hr flight', steal:true,
+     pick:{prop:'The Midland Hotel \u00B7 Tribute Portfolio', area:'The Loop \u00B7 0.3 mi', price:'$104/night pre-tax'},
+     low:'Lowest: Fairfield Chicago Lombard \u2014 $45/night \u00B7 $99 all-in \u00B7 20.7 mi \u00B7 breakfast incl.'}
+  ]
+};
+(function renderRates(){
+  document.getElementById('ratesDates').textContent=WEEKEND_RATES.dates;
+  var html='';
+  WEEKEND_RATES.cities.forEach(function(c,i){
+    html+='<div class="rate-card" style="animation-delay:'+(i*0.16)+'s"><div class="rate-top"><span class="rate-city">'+c.city+'</span><span class="rate-tag">'+c.tag+'</span>'
+      +(c.steal?'<span class="rate-steal">Weekend steal</span>':'')+'</div>'
+      +'<div class="rate-pick"><b>'+c.pick.prop+'</b> \u2014 <span class="rate-price">'+c.pick.price+'</span><br><span style="font-size:13px;color:var(--dim)">'+c.pick.area+'</span></div>'
+      +'<div class="rate-low">'+c.low+'</div>'
+      +(c.note?'<div class="rate-note">'+c.note+'</div>':'')+'</div>';
+  });
+  document.getElementById('ratesList').innerHTML=html;
+  document.getElementById('ratesFoot').textContent='Checked '+WEEKEND_RATES.checked+' on Marriott.com \u00B7 Explore Associate (MMA) rates, taxes/fees included where shown \u00B7 Rates change \u2014 verify on Marriott.com before booking \u00B7 Hidden in Meeting Mode';
+})();
+
 /* ---------- News cycler ---------- */
 var NEWS=[
   {h:'Jefferies lifts its Marriott price target to $429, Goldman Sachs to $406, ahead of Q3 earnings on Nov 2',s:'Analyst roundup · Oct 17, 2026',img:'https://www.marketbeat.com/logos/marriott-international-inc-logo.png?v=20200227112206'},
@@ -608,8 +677,8 @@ document.getElementById('videoReset').addEventListener('click',function(){
   showVideo(DEFAULT_VIDEO);refreshVideoLabel();document.getElementById('videoPanel').hidden=true;
 });
 /* ---------- Scene rotation + meeting mode ---------- */
-var scenes=['scene-stock','scene-spotlight','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
-var SCENE_DUR={'scene-stock':36000,'scene-spotlight':72000,'scene-news':36000,'scene-video':40000};
+var scenes=['scene-stock','scene-spotlight','scene-rates','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
+var SCENE_DUR={'scene-stock':36000,'scene-spotlight':72000,'scene-rates':30000,'scene-news':36000,'scene-video':40000};
 function goScene(i){
   cur=((i%scenes.length)+scenes.length)%scenes.length;
   scenes.forEach(function(id,j){var el=document.getElementById(id);el.className=el.className.replace(/ ?\bon\b/g,'')+(j===cur?' on':'');});
