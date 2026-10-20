@@ -111,7 +111,7 @@
   <section class="scene video" id="scene-video">
     <div id="ytSetup">
       <div style="font-size:20px;font-weight:800">Bonvoy TV, ambient edition</div>
-      <p>Paste any YouTube playlist URL from <b>youtube.com/@MarriottBonvoy</b> (Travel by Design lives there). It auto-plays muted, loops, and is remembered on this device.</p>
+      <p>Now playing the official Marriott Bonvoy uploads playlist by default — newest brand films, Travel by Design included. Paste a different playlist URL below to override it on this device.</p>
       <input id="ytInput" placeholder="youtube.com/playlist?list=PLxxxxxxxx">
       <button class="btn" id="ytSave">Save &amp; play</button>
       <div style="margin-top:10px"><button class="btn ghost" id="ytSkip">Skip for now</button></div>
@@ -228,11 +228,14 @@ function showNews(i){
 function newsCycle(){showNews(newsIdx);newsIdx=(newsIdx+1)%NEWS.length;}
 newsCycle();
 
-/* ---------- YouTube playlist (persisted) ---------- */
+/* ---------- YouTube playlist ----------
+   Source of truth: DEFAULT_PLAYLIST below, baked into the page (verified Oct 19 2026).
+   A paste-in override still wins if one was saved on the device. */
+var DEFAULT_PLAYLIST='UU5d4VoZzRbIxqVqFtyWhGWQ'; // Marriott Bonvoy channel uploads — newest brand films, Travel by Design included
 var ytScene=document.getElementById('scene-video');
-function showPlayer(id){
+function showPlayer(id,label){
   ytScene.innerHTML='<iframe id="ytFrame" src="https://www.youtube.com/embed/videoseries?list='+id+'&autoplay=1&mute=1&loop=1&rel=0&controls=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>'
-    +'<div class="vidcap"><div class="t">MARRIOTT BONVOY</div><div class="s">Travel by Design and brand films, playing muted on loop</div></div>';
+    +'<div class="vidcap"><div class="t">MARRIOTT BONVOY</div><div class="s">'+label+'</div></div>';
 }
 document.getElementById('ytSave').addEventListener('click',function(){
   var raw=document.getElementById('ytInput').value.trim();
@@ -240,10 +243,15 @@ document.getElementById('ytSave').addEventListener('click',function(){
   var id=m?m[1]:raw;
   if(!id)return;
   try{localStorage.setItem('marriott_yt_playlist',id);}catch(e){}
-  showPlayer(id);
+  showPlayer(id,'Custom playlist · saved on this device');
 });
 document.getElementById('ytSkip').addEventListener('click',function(){nextScene();});
-try{var saved=localStorage.getItem('marriott_yt_playlist');if(saved)showPlayer(saved);}catch(e){}
+/* Default plays with zero setup; a saved override wins */
+try{
+  var savedPl=localStorage.getItem('marriott_yt_playlist');
+  if(savedPl)showPlayer(savedPl,'Custom playlist · saved on this device');
+  else showPlayer(DEFAULT_PLAYLIST,'Marriott Bonvoy · latest uploads, playing muted on loop');
+}catch(e){ showPlayer(DEFAULT_PLAYLIST,'Marriott Bonvoy · latest uploads, playing muted on loop'); }
 
 /* ---------- Scene rotation + meeting mode ---------- */
 var scenes=['scene-stock','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
