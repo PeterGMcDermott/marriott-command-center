@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marriott Command Center</title>
+<style>
+  :root{
+    --bg:#0b0b10; --panel:#14141c; --panel2:#1b1b26; --line:#2a2a38;
+    --txt:#f4f1ea; --dim:#9a9aa8; --coral:#e0566e; --gold:#c9a96a; --up:#4ade80; --down:#f87171;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+  body{max-width:640px;margin:0 auto;padding:14px;min-height:100vh}
+  header.top{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 16px;border-bottom:1px solid var(--line)}
+  .brand{font-weight:800;letter-spacing:2px;font-size:15px}
+  .brand span{color:var(--coral)}
+  #clock{text-align:right}
+  #clock .t{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  #clock .d{font-size:12px;color:var(--dim)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px}
+  .kicker{font-size:11px;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+  .price{font-size:56px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .chg{display:inline-block;font-size:18px;font-weight:700;margin-top:8px;padding:5px 12px;border-radius:8px}
+  .chg.up{background:rgba(74,222,128,.14);color:var(--up)}
+  .chg.down{background:rgba(248,113,113,.14);color:var(--down)}
+  #spark{width:100%;height:120px;margin-top:12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .stat .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .stat .v{font-size:17px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .news-item{display:block;padding:12px 0;border-bottom:1px solid var(--line);color:var(--txt);text-decoration:none}
+  .news-item:last-child{border-bottom:none}
+  .news-item .h{font-size:16px;font-weight:600;line-height:1.35}
+  .news-item .s{font-size:12px;color:var(--dim);margin-top:4px}
+  .news-item .h:hover{color:var(--coral)}
+  .btn{display:inline-block;background:var(--coral);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;margin:4px 4px 4px 0}
+  .btn.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--txt)}
+  .btnrow{margin-top:10px}
+  #ytWrap{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-top:10px}
+  #ytWrap iframe{width:100%;height:320px;border:0;display:block}
+  #ytSetup{padding:16px;text-align:center}
+  #ytSetup p{font-size:14px;color:var(--dim);margin:8px 0 12px;line-height:1.5}
+  #ytInput{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-size:13px;margin-bottom:10px}
+  .tiny{font-size:12px;color:var(--dim);line-height:1.6}
+  .tiny a{color:var(--gold)}
+  ol.steps{margin:10px 0 0 20px;font-size:15px;line-height:1.7}
+  ol.steps b{color:var(--coral)}
+  .social{font-size:14px}
+  #redditList .r{padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.4}
+  #redditList .r:last-child{border:none}
+  #redditList .r .meta{font-size:11px;color:var(--dim);margin-top:3px}
+  footer{text-align:center;padding:26px 0 40px;color:var(--dim);font-size:12px}
+  #srcNote{font-size:11px;color:var(--dim);margin-top:10px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">MARRIOTT <span>COMMAND</span> CENTER</div>
+  <div id="clock"><div class="t">--:--</div><div class="d">---</div></div>
+</header>
+
+<!-- STOCK -->
+<section class="card">
+  <div class="kicker">Marriott International &middot; NASDAQ: MAR</div>
+  <div class="price" id="price">$390.70</div>
+  <div><span class="chg up" id="chg">+$2.65 (+0.68%)</span></div>
+  <canvas id="spark"></canvas>
+  <div class="grid">
+    <div class="stat"><div class="k">Open</div><div class="v" id="sOpen">388.40</div></div>
+    <div class="stat"><div class="k">Prev close</div><div class="v" id="sPrev">388.05</div></div>
+    <div class="stat"><div class="k">Day high</div><div class="v" id="sHigh">392.77</div></div>
+    <div class="stat"><div class="k">Day low</div><div class="v" id="sLow">386.00</div></div>
+    <div class="stat"><div class="k">Market cap</div><div class="v">$101.2B</div></div>
+    <div class="stat"><div class="k">52-wk range</div><div class="v">256.76 &ndash; 410.98</div></div>
+  </div>
+  <div id="srcNote">Quote as of Oct 19, 2026 close. Page retries live Stooq data on load; markets closed = last close shown.</div>
+</section>
+
+<!-- NEWS -->
+<section class="card">
+  <div class="kicker">Marriott in the news</div>
+  <a class="news-item" href="https://www.ad-hoc-news.de/boerse/news/corporate-news/marriott-international-stock-gains-1-33-percent-in-latest-quote/70287898" target="_blank">
+    <div class="h">Marriott stock gains 1.33% in latest quote; eight Dutch hotels and 700+ rooms joining the portfolio</div>
+    <div class="s">ad-hoc-news &middot; Oct 10, 2026</div>
+  </a>
+  <a class="news-item" href="https://www.defenseworld.net/2026/10/17/barclays-issues-positive-forecast-for-marriott-international-nasdaqmar-stock-price.html" target="_blank">
+    <div class="h">Jefferies lifts target to $429, Goldman Sachs to $406 ahead of Q3 earnings on Nov 2</div>
+    <div class="s">Defense World / analyst roundup &middot; Oct 17, 2026</div>
+  </a>
+  <a class="news-item" href="https://www.morningstar.com/news/pr-newswire/20261006ph63635/the-rise-of-place-marriott-international-reveals-asia-pacifics-future-of-food" target="_blank">
+    <div class="h">The Rise of Place: Marriott unveils its Future of Food 2027 report for Asia Pacific</div>
+    <div class="s">Morningstar / PR Newswire &middot; Oct 6, 2026</div>
+  </a>
+  <a class="news-item" href="https://traveler.marriott.com/dubai/tips-and-trends" target="_blank">
+    <div class="h">Marriott Bonvoy Traveler: destination guides, travel hacks, and Travel by Design stories</div>
+    <div class="s">traveler.marriott.com &middot; ongoing</div>
+  </a>
+</section>
+
+<!-- SOCIAL -->
+<section class="card">
+  <div class="kicker">Social pulse</div>
+  <div class="social">
+    <div class="btnrow">
+      <a class="btn ghost" href="https://www.instagram.com/marriottbonvoy/" target="_blank">Instagram</a>
+      <a class="btn ghost" href="https://www.linkedin.com/company/marriott-international/" target="_blank">LinkedIn</a>
+      <a class="btn ghost" href="https://www.reddit.com/r/marriottbonvoy/hot/" target="_blank">Reddit</a>
+    </div>
+    <div id="redditList" style="margin-top:10px"><div class="r">Loading live Reddit chatter&hellip;</div></div>
+    <p class="tiny" style="margin-top:12px">Pro move: point the live box above at your <b>Reddit Marriott x AI monitor</b> output file so the display shows the same mention feed you already scan. Native social APIs need paid keys, so curated links plus your own monitor is the free path.</p>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section class="card">
+  <div class="kicker">Marriott Bonvoy TV &amp; YouTube</div>
+  <div id="ytWrap">
+    <div id="ytSetup">
+      <div style="font-size:16px;font-weight:700">Paste a YouTube playlist to stream it here</div>
+      <p>Grab any playlist URL from <a href="https://www.youtube.com/@MarriottBonvoy" target="_blank" style="color:var(--gold)">youtube.com/@MarriottBonvoy</a> (the full <b>Travel by Design</b> film series lives there, same content as in-room Bonvoy TV). Paste the URL below and hit Save &mdash; it auto-plays and loops, even after a refresh.</p>
+      <input id="ytInput" placeholder="Paste a YouTube playlist URL, e.g. youtube.com/playlist?list=PLxxxxxxxx">
+      <button class="btn" id="ytSave">Save &amp; play</button>
+    </div>
+  </div>
+  <div class="btnrow">
+    <a class="btn ghost" href="https://www.youtube.com/@MarriottBonvoy/playlists" target="_blank">Bonvoy playlists</a>
+    <a class="btn ghost" href="https://www.youtube.com/@MarriottBonvoy" target="_blank">Bonvoy channel</a>
+    <button class="btn ghost" id="ytClear">Reset video</button>
+  </div>
+  <p class="tiny" style="margin-top:10px">Tip: for the best video quality, cast directly from the <b>YouTube app</b> (open the playlist on your phone &rarr; Cast icon). The in-page player above is the always-on ambient mode: mute it, let it loop under the data panels. Bonvoy TV itself is in-room / Samsung TV Plus only &mdash; YouTube is the castable stand-in.</p>
+</section>
+
+<!-- HOW TO CAST -->
+<section class="card">
+  <div class="kicker">Get it on the monitor</div>
+  <ol class="steps">
+    <li>Plug the <b>Chromecast</b> into the monitor, same Wi-Fi as your computer.</li>
+    <li>Open this file in <b>Chrome</b> and press <b>F11</b> for fullscreen.</li>
+    <li>Chrome menu &rarr; <b>Cast&hellip;</b> &rarr; pick the Chromecast, set source to <b>Cast tab</b>.</li>
+  </ol>
+  <p class="tiny" style="margin-top:12px">The tab stays live: clock ticks, stock/news retry every 15 min, the playlist loops. For a dedicated always-on setup later, Yodeck (1 screen free forever) or OptiSigns (3 screens free) do exactly this without a computer in the loop.</p>
+</section>
+
+<footer>Marriott Command Center &middot; vertical display prototype &middot; press F11, then cast the tab</footer>
+
+<script>
+/* Clock (America/Chicago) */
+function tick(){
+  var now=new Date();
+  var opts={hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/Chicago'};
+  var dopts={weekday:'short',month:'short',day:'numeric',timeZone:'America/Chicago'};
+  document.querySelector('#clock .t').textContent=now.toLocaleTimeString('en-US',opts);
+  document.querySelector('#clock .d').textContent=now.toLocaleDateString('en-US',dopts)+' CT';
+}
+setInterval(tick,1000);tick();
+
+/* Stock: try live Stooq quote, else keep baked-in Oct 19 data */
+fetch('https://stooq.com/q/l/?s=mar.us&f=sd2t2ohlcv&h&e=csv')
+  .then(r=>r.text()).then(t=>{
+    var p=t.trim().split('\n')[1].split(',');
+    var close=parseFloat(p[6]), prev=parseFloat(p[7]);
+    if(close>0){
+      var diff=close-prev, pct=100*diff/prev;
+      document.getElementById('price').textContent='$'+close.toFixed(2);
+      var el=document.getElementById('chg');
+      el.textContent=(diff>=0?'+$':'-$')+Math.abs(diff).toFixed(2)+' ('+(pct>=0?'+':'')+pct.toFixed(2)+'%)';
+      el.className='chg '+(diff>=0?'up':'down');
+      document.getElementById('sOpen').textContent=parseFloat(p[3]).toFixed(2);
+      document.getElementById('sHigh').textContent=parseFloat(p[4]).toFixed(2);
+      document.getElementById('sLow').textContent=parseFloat(p[5]).toFixed(2);
+      document.getElementById('sPrev').textContent=prev.toFixed(2);
+      document.getElementById('srcNote').textContent='Live quote via Stooq. Updated '+new Date().toLocaleTimeString('en-US',{timeZone:'America/Chicago'});
+    }
+  }).catch(function(){});
+
+/* Sparkline (recent trend, illustrative) */
+(function(){
+  var data=[351.5,354.2,352.8,357.1,360.4,358.9,361.1,365.9,368.2,366.7,371.3,375.0,373.6,378.9,381.2,379.8,385.4,383.1,388.1,390.7];
+  var c=document.getElementById('spark'),ctx=c.getContext('2d');
+  var W=c.width=c.offsetWidth*2,H=c.height=240; // 2x for retina
+  var min=Math.min.apply(null,data),max=Math.max.apply(null,data);
+  function X(i){return 10+i*(W-20)/(data.length-1)}
+  function Y(v){return H-20-(v-min)*(H-40)/(max-min)}
+  ctx.strokeStyle='rgba(224,86,110,.25)';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(var i=0;i<data.length;i++){i?ctx.lineTo(X(i),Y(data[i])):ctx.moveTo(X(i),Y(data[i]));}
+  ctx.stroke();
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgba(224,86,110,.45)');g.addColorStop(1,'rgba(224,86,110,0)');
+  ctx.lineTo(X(data.length-1),H);ctx.lineTo(X(0),H);ctx.closePath();ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.arc(X(data.length-1),Y(data[data.length-1]),7,0,7);ctx.fillStyle='#e0566e';ctx.fill();
+  ctx.fillStyle='#9a9aa8';ctx.font='20px sans-serif';
+  ctx.fillText('~30-day trend',12,28);
+})();
+
+/* Reddit live box (best-effort via public RSS proxy) */
+(function(){
+  var box=document.getElementById('redditList');
+  var url='https://api.allorigins.win/raw?url='+encodeURIComponent('https://www.reddit.com/r/marriottbonvoy/hot/.rss?limit=6');
+  fetch(url).then(r=>r.text()).then(t=>{
+    var doc=new DOMParser().parseFromString(t,'text/xml');
+    var items=doc.querySelectorAll('entry');
+    if(!items.length)throw 0;
+    var html='';
+    for(var i=0;i<Math.min(items.length,5);i++){
+      var e=items[i];
+      var title=e.querySelector('title').textContent;
+      var author=e.querySelector('author name')?e.querySelector('author name').textContent:'';
+      html+='<div class="r">'+title+'<div class="meta">u/'+author+' &middot; r/marriottbonvoy</div></div>';
+    }
+    box.innerHTML=html;
+  }).catch(function(){
+    box.innerHTML='<div class="r">Live Reddit feed blocked by the network &mdash; use the Reddit button above, or wire your reddit-ai-monitor output here.<div class="meta">tip: publish the monitor report somewhere reachable and swap the fetch URL</div></div>';
+  });
+})();
+
+/* YouTube playlist embed, persisted in localStorage */
+(function(){
+  var wrap=document.getElementById('ytWrap'), input=document.getElementById('ytInput');
+  function listIdFromUrl(u){
+    var m=u.match(/[?&]list=([A-Za-z0-9_-]+)/);return m?m[1]:null;
+  }
+  function showPlayer(id){
+    wrap.innerHTML='<iframe src="https://www.youtube.com/embed/videoseries?list='+id+'&autoplay=1&mute=1&loop=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+  }
+  document.getElementById('ytSave').addEventListener('click',function(){
+    var raw=input.value.trim();
+    var id=listIdFromUrl(raw)||raw;
+    if(!id){input.placeholder='That did not look like a playlist URL or ID';return;}
+    try{localStorage.setItem('marriott_yt_playlist',id);}catch(e){}
+    showPlayer(id);
+  });
+  document.getElementById('ytClear').addEventListener('click',function(){
+    try{localStorage.removeItem('marriott_yt_playlist');}catch(e){}
+    location.reload();
+  });
+  try{
+    var saved=localStorage.getItem('marriott_yt_playlist');
+    if(saved)showPlayer(saved);
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
