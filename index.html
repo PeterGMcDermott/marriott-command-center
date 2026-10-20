@@ -109,15 +109,21 @@
 
   <!-- SCENE 3: VIDEO -->
   <section class="scene video" id="scene-video">
-    <div id="ytSetup">
-      <div style="font-size:20px;font-weight:800">Bonvoy TV, ambient edition</div>
-      <p>Now playing the official Marriott Bonvoy uploads playlist by default — newest brand films, Travel by Design included. Paste a different playlist URL below to override it on this device.</p>
-      <input id="ytInput" placeholder="youtube.com/playlist?list=PLxxxxxxxx">
-      <button class="btn" id="ytSave">Save &amp; play</button>
-      <div style="margin-top:10px"><button class="btn ghost" id="ytSkip">Skip for now</button></div>
-    </div>
+    <div class="vidloading">Loading Bonvoy video&hellip;</div>
   </section>
 
+</div>
+
+<div id="videoPanel" hidden>
+  <div class="kicker">Video source</div>
+  <div class="tiny" id="videoNow"></div>
+  <input id="videoInput" placeholder="Paste any YouTube link — video, Short, or playlist">
+  <div class="btnrow2">
+    <button class="btn" id="videoSave">Save &amp; play</button>
+    <button class="btn ghost" id="videoReset">Reset to default</button>
+    <button class="btn ghost" id="videoClose">Close</button>
+  </div>
+  <div class="tiny" style="margin-top:8px">The page default is baked into the repo (change it there to change every display at once). A saved override applies to this device only.</div>
 </div>
 
 <div id="tape"><div id="tapeInner"></div></div>
@@ -125,6 +131,7 @@
 <div id="controls">
   <button id="btnPause">&#10073;&#10073; Pause rotation</button>
   <button id="btnMeeting">Meeting mode</button>
+  <button id="btnVideo">&#127916; Video</button>
   <button id="btnFull">Fullscreen</button>
 </div>
 <div class="hint">Keys: M = meeting mode &middot; Space = pause &middot; F = fullscreen &middot; Scenes rotate every 40s</div>
@@ -228,31 +235,59 @@ function showNews(i){
 function newsCycle(){showNews(newsIdx);newsIdx=(newsIdx+1)%NEWS.length;}
 newsCycle();
 
-/* ---------- YouTube playlist ----------
-   Source of truth: DEFAULT_PLAYLIST below, baked into the page (verified Oct 19 2026).
-   A paste-in override still wins if one was saved on the device. */
-var DEFAULT_PLAYLIST='UU5d4VoZzRbIxqVqFtyWhGWQ'; // Marriott Bonvoy channel uploads — newest brand films, Travel by Design included
+/* ---------- Video ----------
+   Source of truth: DEFAULT_VIDEO baked in (his pick, Oct 19 2026).
+   The Video button opens an updater; a saved override wins per device. */
+var DEFAULT_VIDEO={type:'video',id:'YEYQYlHO5EY',label:'"Introducing Marriott Bonvoy Outdoors" · Marriott Bonvoy'};
+var VIDEO_STORE='marriott_video_override';
 var ytScene=document.getElementById('scene-video');
-function showPlayer(id,label){
-  ytScene.innerHTML='<iframe id="ytFrame" src="https://www.youtube.com/embed/videoseries?list='+id+'&autoplay=1&mute=1&loop=1&rel=0&controls=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>'
-    +'<div class="vidcap"><div class="t">MARRIOTT BONVOY</div><div class="s">'+label+'</div></div>';
+function parseYouTube(u){
+  u=(u||'').trim();if(!u)return null;
+  var list=(u.match(/[?&]list=([A-Za-z0-9_-]{2,})/)||[])[1];
+  if(list)return {type:'playlist',id:list,label:'Custom playlist'};
+  var m=u.match(/(?:shorts\/|watch\?v=|youtu\.be\/|embed\/|\/v\/)([A-Za-z0-9_-]{11})/)||u.match(/^([A-Za-z0-9_-]{11})$/);
+  if(m)return {type:'video',id:m[1],label:'Custom video'};
+  if(/^(UU|PL|FL|RD)[A-Za-z0-9_-]{10,}$/.test(u))return {type:'playlist',id:u,label:'Custom playlist'};
+  return null;
 }
-document.getElementById('ytSave').addEventListener('click',function(){
-  var raw=document.getElementById('ytInput').value.trim();
-  var m=raw.match(/[?&]list=([A-Za-z0-9_-]+)/);
-  var id=m?m[1]:raw;
-  if(!id)return;
-  try{localStorage.setItem('marriott_yt_playlist',id);}catch(e){}
-  showPlayer(id,'Custom playlist · saved on this device');
+function embedUrl(spec){
+  if(spec.type==='playlist')return 'https://www.youtube.com/embed/videoseries?list='+spec.id+'&autoplay=1&mute=1&loop=1&rel=0&controls=0';
+  return 'https://www.youtube.com/embed/'+spec.id+'?autoplay=1&mute=1&loop=1&playlist='+spec.id+'&rel=0&controls=0';
+}
+function showVideo(spec){
+  ytScene.innerHTML='<iframe id="ytFrame" src="'+embedUrl(spec)+'" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>'
+    +'<div class="vidcap"><div class="t">MARRIOTT BONVOY</div><div class="s">Now playing · '+spec.label+'</div></div>';
+}
+function currentSpec(){
+  try{
+    var raw=localStorage.getItem(VIDEO_STORE);
+    if(raw){var o=JSON.parse(raw);o.override=true;return o;}
+    var legacy=localStorage.getItem('marriott_yt_playlist');
+    if(legacy)return {type:'playlist',id:legacy,label:'Custom playlist · saved on this device',override:true};
+  }catch(e){}
+  return DEFAULT_VIDEO;
+}
+function refreshVideoLabel(){
+  var sp=currentSpec();
+  document.getElementById('videoNow').innerHTML='Now showing: <b>'+sp.label+'</b>'+(sp.override?' <span style="color:var(--coral)">(device override)</span>':' <span style="color:var(--dim)">(baked-in default)</span>');
+}
+showVideo(currentSpec());
+document.getElementById('btnVideo').addEventListener('click',function(){
+  var pnl=document.getElementById('videoPanel');
+  refreshVideoLabel();pnl.hidden=!pnl.hidden;
 });
-document.getElementById('ytSkip').addEventListener('click',function(){nextScene();});
-/* Default plays with zero setup; a saved override wins */
-try{
-  var savedPl=localStorage.getItem('marriott_yt_playlist');
-  if(savedPl)showPlayer(savedPl,'Custom playlist · saved on this device');
-  else showPlayer(DEFAULT_PLAYLIST,'Marriott Bonvoy · latest uploads, playing muted on loop');
-}catch(e){ showPlayer(DEFAULT_PLAYLIST,'Marriott Bonvoy · latest uploads, playing muted on loop'); }
-
+document.getElementById('videoClose').addEventListener('click',function(){document.getElementById('videoPanel').hidden=true;});
+document.getElementById('videoSave').addEventListener('click',function(){
+  var spec=parseYouTube(document.getElementById('videoInput').value);
+  if(!spec){document.getElementById('videoInput').placeholder='That did not look like a YouTube video or playlist link';return;}
+  try{localStorage.setItem(VIDEO_STORE,JSON.stringify(spec));}catch(e){}
+  spec.override=true;showVideo(spec);refreshVideoLabel();document.getElementById('videoPanel').hidden=true;
+});
+document.getElementById('videoReset').addEventListener('click',function(){
+  try{localStorage.removeItem(VIDEO_STORE);localStorage.removeItem('marriott_yt_playlist');}catch(e){}
+  document.getElementById('videoInput').value='';
+  showVideo(DEFAULT_VIDEO);refreshVideoLabel();document.getElementById('videoPanel').hidden=true;
+});
 /* ---------- Scene rotation + meeting mode ---------- */
 var scenes=['scene-stock','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
 function goScene(i){
