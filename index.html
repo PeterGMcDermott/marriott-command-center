@@ -11,7 +11,7 @@
   /* ===== Dark theme, designed for 1080x1920 portrait (9:16) ===== */
   :root{
     --bg:#0B0B0C; --panel:#101012; --panel2:#1B1B1E; --panel3:#242427;
-    --line:#2C2C30; --txt:#EDECE7; --dim:#A3A39D;
+    --line:#2C2C30; --txt:#EDECE7; --dim:#B8B8B2;
     --coral:#FF9662; --up:#4ADE80; --down:#F87171;
     --sans:'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif;
     --serif:'Newsreader',Georgia,'Times New Roman',serif;
@@ -22,73 +22,78 @@
   body.meeting{filter:brightness(.5) saturate(.7)}
 
   header.top{display:flex;justify-content:space-between;align-items:center;padding:26px 36px 22px;background:#000000;color:var(--txt);border-bottom:1px solid var(--line);flex:none}
-  .brand{font-weight:800;letter-spacing:3px;font-size:23px}
-  .brand span{color:var(--coral)}
+  .brand{font-weight:800;letter-spacing:3px;font-size:26px}
+  .brandlogo{height:68px;display:block;filter:invert(1)}
+  .tile-head{display:flex;gap:16px;align-items:center;margin-bottom:10px}
+  .tile-logo{background:#FFFFFF;border-radius:12px;padding:8px 14px;display:inline-flex;align-items:center;justify-content:center;height:60px;min-width:112px;flex:none}
+  .tile-logo img{max-height:42px;max-width:158px;object-fit:contain;display:block}
+  .tile-logo.spot-logo{height:84px;min-width:168px;padding:12px 20px;border-radius:14px}
+  .tile-logo.spot-logo img{max-height:58px;max-width:230px}
   #clock{text-align:right}
-  #clock .t{font-size:38px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
-  #clock .d{font-size:17px;color:var(--dim)}
+  #clock .t{font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+  #clock .d{font-size:20px;color:var(--dim)}
 
   #stage{position:relative;flex:1;overflow:hidden}
   .scene{position:absolute;inset:0;padding:36px;opacity:0;pointer-events:none;transition:opacity 1.4s ease,transform 1.4s ease;transform:scale(1.015);display:flex;flex-direction:column;background:var(--panel)}
   .scene.on{opacity:1;pointer-events:auto;transform:scale(1)}
-  .kicker{font-size:17px;letter-spacing:4px;color:var(--txt);font-weight:700;text-transform:uppercase;margin-bottom:20px}
+  .kicker{font-size:20px;letter-spacing:4px;color:var(--txt);font-weight:700;text-transform:uppercase;margin-bottom:20px}
   .kicker::before{content:'';display:block;width:54px;height:4px;background:var(--coral);border-radius:2px;margin-bottom:14px}
-  .tiny{font-size:15px;color:var(--dim)}
+  .tiny{font-size:18px;color:var(--dim)}
   @keyframes tileIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes spotProgress{from{width:0%}to{width:100%}}
   @keyframes pulseDot{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
 
   /* Stock scene */
-  .price{font-size:138px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-1px}
-  .chg{display:inline-block;font-size:30px;font-weight:700;margin-top:20px;padding:10px 22px;border-radius:12px}
+  .price{font-size:172px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-1px}
+  .chg{display:inline-block;font-size:36px;font-weight:700;margin-top:20px;padding:10px 22px;border-radius:12px}
   .chg.up{background:rgba(74,222,128,.14);color:var(--up)}
   .chg.down{background:rgba(248,113,113,.13);color:var(--down)}
-  #spark{width:100%;height:300px;margin-top:26px}
+  #spark{width:100%;height:330px;margin-top:26px}
   #stockBody{position:relative;flex:1;min-height:0}
   .subview{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;display:flex;flex-direction:column}
   .subview.on{opacity:1;pointer-events:auto}
   .subdots{display:flex;gap:10px;justify-content:center;padding:12px 0;flex:none}
   .subdot{width:34px;height:6px;border-radius:3px;background:#333336}
   .subdot.on{background:var(--coral)}
-  .charttitle{font-size:34px;font-weight:800;margin-bottom:14px}
+  .charttitle{font-size:42px;font-weight:800;margin-bottom:14px}
   #bigchart{width:100%;flex:1;min-height:0}
-  .chartstats{display:flex;gap:26px;margin-top:14px;font-size:21px;color:var(--dim)}
+  .chartstats{display:flex;gap:28px;margin-top:16px;font-size:25px;color:var(--dim)}
   .chartstats b{color:var(--txt);font-variant-numeric:tabular-nums}
   .tilegrid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:16px;flex:1;min-height:0}
   .tile{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;min-width:0;cursor:pointer;transition:transform .35s ease,box-shadow .35s ease;animation:tileIn .7s ease both}
   .tile:hover{transform:scale(1.03);box-shadow:0 14px 34px rgba(0,0,0,.55)}
-  .tile .tk{font-size:25px;font-weight:800}
-  .tile .nm{font-size:17px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tile .pv{font-size:33px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px}
-  .tile .cg{font-size:19px;font-weight:700;margin-top:2px}
+  .tile .tk{font-size:32px;font-weight:800}
+  .tile .nm{font-size:20px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tile .pv{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px}
+  .tile .cg{font-size:24px;font-weight:700;margin-top:2px}
   .tile .cg.up{color:var(--up)} .tile .cg.dn{color:var(--down)}
-  .tile canvas{width:100%;height:84px;margin-top:auto}
+  .tile canvas{width:100%;height:100px;margin-top:auto}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
   .stat{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-  .stat .k{font-size:16px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px}
-  .stat .v{font-size:29px;font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums}
-  .srcNote{font-size:15px;color:var(--dim);margin-top:auto;padding-top:18px}
+  .stat .k{font-size:19px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px}
+  .stat .v{font-size:36px;font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums}
+  .srcNote{font-size:17px;color:var(--dim);margin-top:auto;padding-top:18px}
 
   /* Brand spotlight (expanded tile) */
   #scene-spotlight .spot-top{flex:0 0 33%;display:flex;flex-direction:column;min-height:0;border-bottom:1px solid var(--line);padding-bottom:18px}
   .spot-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-  .spot-tk{font-size:16px;letter-spacing:4px;font-weight:700;text-transform:uppercase}
-  .spot-name{font-family:var(--serif);font-size:47px;font-weight:700;line-height:1.1;margin-top:8px}
-  .spot-price{font-size:86px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;text-align:right}
-  .spot-chg{display:inline-block;font-size:22px;font-weight:700;margin-top:10px;padding:7px 16px;border-radius:10px}
+  .spot-tk{font-size:19px;letter-spacing:4px;font-weight:700;text-transform:uppercase}
+  .spot-name{font-family:var(--serif);font-size:58px;font-weight:700;line-height:1.1;margin-top:8px}
+  .spot-price{font-size:108px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;text-align:right}
+  .spot-chg{display:inline-block;font-size:27px;font-weight:700;margin-top:10px;padding:7px 16px;border-radius:10px}
   .spot-chg.up{background:rgba(74,222,128,.14);color:var(--up)}
   .spot-chg.down{background:rgba(248,113,113,.13);color:var(--down)}
   .spot-chartwrap{flex:1;min-height:0;position:relative;margin-top:12px}
   #spotChart{width:100%;height:100%;display:block}
-  .spot-stats{display:flex;gap:26px;font-size:20px;color:var(--dim);margin-top:12px;flex:none}
+  .spot-stats{display:flex;gap:28px;font-size:24px;color:var(--dim);margin-top:12px;flex:none}
   .spot-stats b{color:var(--txt);font-variant-numeric:tabular-nums}
   .spot-news{flex:1;display:flex;flex-direction:column;padding-top:24px;min-height:0}
   .spot-news .kicker{margin-bottom:18px}
   .hl-card{background:var(--panel2);border:1px solid var(--line);border-left:6px solid var(--coral);border-radius:14px;padding:22px 24px;margin-bottom:18px;display:flex;gap:20px;opacity:0;animation:fadeUp .7s ease forwards}
-  .hl-num{font-size:34px;font-weight:800;color:var(--coral);font-variant-numeric:tabular-nums;line-height:1.2;flex:none}
-  .hl-h{font-family:var(--serif);font-size:31px;font-weight:600;line-height:1.35}
-  .hl-s{font-size:16px;color:var(--dim);margin-top:9px;letter-spacing:.5px;text-transform:uppercase}
+  .hl-num{font-size:40px;font-weight:800;color:var(--coral);font-variant-numeric:tabular-nums;line-height:1.2;flex:none}
+  .hl-h{font-family:var(--serif);font-size:37px;font-weight:600;line-height:1.35}
+  .hl-s{font-size:19px;color:var(--dim);margin-top:9px;letter-spacing:.5px;text-transform:uppercase}
   .spot-foot{flex:none;margin-top:auto}
   .spot-progress{height:6px;background:#2C2C30;border-radius:3px;overflow:hidden;margin-bottom:14px}
   .spot-progress-bar{height:100%;background:var(--coral);animation:spotProgress 12s linear forwards}
@@ -98,25 +103,25 @@
   .pulse-dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--coral);margin-right:10px;animation:pulseDot 1.6s ease infinite;vertical-align:middle}
 
   /* Weekend MMA rates scene */
-  .rates-dates{font-family:var(--serif);font-size:44px;font-weight:700;line-height:1.2}
-  .rates-sub{font-size:19px;color:var(--dim);margin:8px 0 24px}
+  .rates-dates{font-family:var(--serif);font-size:52px;font-weight:700;line-height:1.2}
+  .rates-sub{font-size:22px;color:var(--dim);margin:8px 0 24px}
   #ratesList{display:flex;flex-direction:column;gap:16px}
   .rate-card{background:var(--panel2);border:1px solid var(--line);border-left:6px solid var(--coral);border-radius:14px;padding:20px 24px;opacity:0;animation:fadeUp .7s ease forwards}
   .rate-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .rate-city{font-size:26px;font-weight:800;letter-spacing:3px}
-  .rate-tag{font-size:16px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px}
-  .rate-steal{margin-left:auto;background:var(--coral);color:#141414;font-size:16px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:999px;text-transform:uppercase}
-  .rate-pick{font-size:24px;line-height:1.45;margin-top:10px}
+  .rate-city{font-size:32px;font-weight:800;letter-spacing:3px}
+  .rate-tag{font-size:19px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px}
+  .rate-steal{margin-left:auto;background:var(--coral);color:#141414;font-size:19px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:999px;text-transform:uppercase}
+  .rate-pick{font-size:29px;line-height:1.45;margin-top:10px}
   .rate-pick b{font-weight:800}
   .rate-price{font-weight:800;font-variant-numeric:tabular-nums;color:#FFFFFF}
-  .rate-low{font-size:20px;color:#C9C9C3;line-height:1.5;margin-top:6px}
-  .rate-note{font-size:18px;color:var(--dim);margin-top:4px}
-  .rates-foot{font-size:15px;color:var(--dim);margin-top:auto;padding-top:16px;line-height:1.55}
+  .rate-low{font-size:24px;color:#C9C9C3;line-height:1.5;margin-top:6px}
+  .rate-note{font-size:21px;color:var(--dim);margin-top:4px}
+  .rates-foot{font-size:17px;color:var(--dim);margin-top:auto;padding-top:16px;line-height:1.55}
 
   /* News scene */
-  #newsImg{width:100%;height:430px;object-fit:cover;border-radius:16px;margin-bottom:26px;opacity:0;transition:opacity .6s ease;background:var(--panel2)}
-  #newsBig{font-family:var(--serif);font-size:57px;font-weight:600;line-height:1.32;transition:opacity .6s ease}
-  #newsSrc{font-size:20px;color:var(--dim);margin-top:24px;transition:opacity .6s ease}
+  #newsImg{width:100%;height:470px;object-fit:cover;border-radius:16px;margin-bottom:26px;opacity:0;transition:opacity .6s ease;background:var(--panel2)}
+  #newsBig{font-family:var(--serif);font-size:68px;font-weight:600;line-height:1.32;transition:opacity .6s ease}
+  #newsSrc{font-size:24px;color:var(--dim);margin-top:24px;transition:opacity .6s ease}
   .dots{margin-top:auto;display:flex;gap:10px}
   .dot{width:38px;height:6px;border-radius:3px;background:#333336}
   .dot.on{background:var(--coral)}
@@ -126,8 +131,8 @@
   #ytFrame{width:100%;height:100%;border:0}
   .vidloading{margin:auto;font-size:20px;color:var(--dim)}
   .vidcap{position:absolute;left:0;right:0;bottom:0;padding:44px 36px 28px;background:linear-gradient(transparent,rgba(0,0,0,.88));pointer-events:none}
-  .vidcap .t{font-size:30px;font-weight:800;letter-spacing:3px}
-  .vidcap .s{font-size:19px;color:#ddd;margin-top:6px}
+  .vidcap .t{font-size:38px;font-weight:800;letter-spacing:3px}
+  .vidcap .s{font-size:23px;color:#ddd;margin-top:6px}
   #videoPanel{flex:none;background:var(--panel2);border-top:1px solid var(--line);padding:22px 36px}
   #videoPanel .kicker{margin-bottom:10px}
   #videoInput{width:100%;padding:16px;border-radius:12px;border:1px solid var(--line);background:#121214;color:var(--txt);font-size:18px;margin:12px 0}
@@ -140,21 +145,21 @@
   #tapeInner{display:inline-block;animation:tape 60s linear infinite;will-change:transform}
   body.meeting #tapeInner{animation-duration:120s}
   @keyframes tape{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  #tapeInner span{margin:0 36px;font-size:22px;font-weight:600}
+  #tapeInner span{margin:0 40px;font-size:28px;font-weight:600}
   #tapeInner .lbl{color:var(--coral)}
   #tapeInner .up{color:#4ade80} #tapeInner .dn{color:#f87171}
 
   /* Controls */
   #controls{flex:none;display:flex;gap:10px;justify-content:center;padding:16px;background:var(--panel)}
-  #controls button{background:var(--panel3);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:13px 24px;font-size:18px;font-weight:600;cursor:pointer}
+  #controls button{background:var(--panel3);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:14px 26px;font-size:20px;font-weight:600;cursor:pointer}
   #controls button.active{background:var(--coral);border-color:var(--coral);color:#141414}
-  .hint{text-align:center;font-size:15px;color:var(--dim);padding-bottom:14px;background:var(--panel)}
+  .hint{text-align:center;font-size:17px;color:var(--dim);padding-bottom:14px;background:var(--panel)}
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="brand">MARRIOTT <span>COMMAND</span> CENTER</div>
+  <img class="brandlogo" src="assets/logo-marriott.png" alt="Marriott International" onerror="this.outerHTML='<div class=&quot;brand&quot;>MARRIOTT INTERNATIONAL</div>'">
   <div id="clock"><div class="t">--:--</div><div class="d">---</div></div>
 </header>
 
@@ -277,12 +282,12 @@ var tapeItems=[
 
 /* ---------- Peers & sub-view cycler ---------- */
 var PEERS=[
-  {s:'mar.us',t:'MAR',n:'Marriott Intl'},
-  {s:'hlt.us',t:'HLT',n:'Hilton'},
-  {s:'ihg.us',t:'IHG',n:'InterContinental'},
-  {s:'h.us',t:'H',n:'Hyatt'},
-  {s:'wh.us',t:'WH',n:'Wyndham'},
-  {s:'chh.us',t:'CHH',n:'Choice Hotels'}
+  {s:'mar.us',t:'MAR',n:'Marriott Intl',logo:'assets/logo-marriott.png'},
+  {s:'hlt.us',t:'HLT',n:'Hilton',logo:'assets/logo-hilton.png'},
+  {s:'ihg.us',t:'IHG',n:'InterContinental',logo:'assets/logo-ihg.png'},
+  {s:'h.us',t:'H',n:'Hyatt',logo:'assets/logo-hyatt.png'},
+  {s:'wh.us',t:'WH',n:'Wyndham',logo:'assets/logo-wyndham.png'},
+  {s:'chh.us',t:'CHH',n:'Choice Hotels',logo:'assets/logo-choice.png'}
 ];
 var BAKED_PEERS={"mar.us": {"price": 390.7, "prev": 388.05, "open": 388.4, "high": 392.77, "low": 386.0, "hist": [366.93, 367.81, 369.8, 364.47, 374.43, 383.06, 383.52, 381.12, 375.48, 372.83, 346.83, 345.2, 361.31, 359.67, 353.91, 348.44, 349.49, 354.58, 352.53, 356.72, 356.57, 357.33, 359.95, 356.6, 356.39, 360.2, 357.77, 358.67, 353.87, 351.08, 341.76, 334.55, 333.14, 336.07, 336.51, 328.79, 331.52, 329.07, 334.69, 340.46, 337.24, 334.97, 334.0, 338.92, 342.66, 348.06, 351.66, 351.51, 352.03, 358.57, 361.62, 355.67, 354.79, 358.96, 355.89, 361.28, 356.5, 361.08, 365.88, 369.3, 371.5, 371.82, 385.71, 388.05, 390.7]}, "hlt.us": {"price": 346.04, "prev": 345.12, "open": 342.74, "high": 346.34, "low": 341.94, "hist": [323.43, 323.94, 324.23, 320.18, 324.97, 330.85, 322.43, 321.72, 322.02, 320.49, 314.34, 312.07, 324.56, 321.98, 317.6, 311.0, 314.66, 322.53, 320.82, 327.21, 326.12, 327.74, 334.73, 329.61, 326.63, 330.07, 329.31, 332.56, 325.68, 321.85, 316.28, 311.99, 311.51, 314.35, 311.18, 304.47, 306.99, 306.24, 306.19, 310.6, 307.79, 305.63, 302.54, 305.73, 307.08, 308.44, 307.22, 312.13, 313.96, 320.28, 323.44, 318.12, 315.44, 319.36, 316.12, 322.61, 320.53, 323.29, 326.56, 327.54, 329.59, 328.0, 342.98, 345.12, 346.04]}, "ihg.us": {"price": 168.92, "prev": 167.77, "open": 167.21, "high": 169.1, "low": 166.57, "hist": [156.4, 155.99, 155.54, 154.12, 156.18, 159.51, 162.19, 161.52, 162.59, 162.28, 158.0, 157.11, 160.72, 159.3, 157.51, 155.63, 155.87, 161.82, 159.5, 160.22, 160.25, 159.38, 161.56, 159.74, 159.91, 162.53, 163.75, 164.58, 163.02, 162.38, 160.06, 155.27, 160.51, 160.77, 159.95, 154.69, 154.72, 152.77, 153.83, 155.13, 153.4, 153.76, 153.11, 153.09, 154.6, 154.85, 156.13, 157.66, 158.16, 161.11, 163.1, 160.8, 161.44, 161.74, 159.51, 160.54, 159.9, 159.48, 160.68, 159.85, 160.89, 160.36, 166.15, 167.77, 168.92]}, "h.us": {"price": 171.95, "prev": 169.13, "open": 168.35, "high": 172.43, "low": 168.35, "hist": [189.55, 189.51, 187.43, 183.62, 187.13, 191.18, 188.83, 186.02, 176.68, 174.06, 171.58, 173.6, 178.91, 178.88, 177.71, 170.08, 172.64, 178.37, 179.85, 180.98, 181.6, 178.72, 183.01, 179.48, 180.67, 180.09, 177.01, 177.57, 173.28, 172.25, 166.97, 162.55, 165.02, 165.39, 165.85, 161.11, 158.24, 161.39, 163.07, 163.71, 160.19, 158.65, 154.81, 155.04, 156.95, 157.8, 157.28, 159.03, 158.48, 161.19, 162.01, 158.56, 160.94, 158.9, 156.77, 159.12, 157.14, 159.43, 161.94, 161.18, 162.92, 160.32, 168.91, 169.13, 171.95]}, "wh.us": {"price": 76.19, "prev": 75.6, "open": 75.54, "high": 76.86, "low": 75.2, "hist": [76.57, 75.72, 75.68, 73.48, 73.53, 75.18, 75.67, 75.58, 76.11, 74.86, 75.27, 76.03, 76.12, 75.21, 73.81, 71.35, 72.47, 74.02, 74.31, 73.63, 72.94, 73.36, 75.85, 75.31, 74.62, 74.35, 75.87, 76.84, 76.76, 76.02, 73.66, 71.01, 71.28, 70.99, 71.8, 69.87, 69.78, 68.62, 69.31, 69.2, 67.48, 68.17, 69.17, 68.06, 67.15, 67.86, 69.31, 69.25, 69.99, 70.83, 72.44, 71.84, 71.49, 71.79, 71.22, 72.65, 72.24, 73.36, 74.06, 73.35, 73.42, 72.59, 75.38, 75.6, 76.19]}, "chh.us": {"price": 109.64, "prev": 108.41, "open": 107.54, "high": 110.75, "low": 107.54, "hist": [109.96, 108.13, 108.0, 108.0, 110.52, 113.12, 114.64, 115.65, 111.66, 111.49, 108.47, 108.61, 111.79, 109.73, 106.66, 102.75, 102.63, 105.54, 104.57, 104.44, 104.93, 107.18, 109.21, 109.25, 109.62, 111.12, 110.25, 109.86, 108.54, 108.86, 103.36, 98.12, 100.4, 99.4, 100.62, 100.01, 99.61, 98.23, 96.77, 96.54, 97.42, 98.19, 98.64, 96.85, 99.05, 100.32, 101.64, 100.96, 101.81, 103.0, 104.25, 102.41, 102.31, 102.5, 99.58, 103.06, 103.49, 104.82, 105.64, 103.38, 103.88, 103.44, 106.92, 108.41, 109.64]}};
 var peerData={}; /* sym -> {price, prev, hist:[closes]} */
@@ -321,12 +326,12 @@ function renderTiles(){
   PEERS.forEach(function(p){
     var d=peerData[p.s];
     if(!d||!(d.price>0)){
-      html+='<div class="tile"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div><div class="pv" style="color:var(--dim)">—</div></div>';
+      html+='<div class="tile"><div class="tile-head"><span class="tile-logo"><img src="'+p.logo+'" alt="" onerror="this.parentNode.style.display=\'none\'"></span><div><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div></div></div><div class="pv" style="color:var(--dim)">—</div></div>';
       return;
     }
     var diff=d.price-d.prev,pct=100*diff/d.prev,up=diff>=0;
     var peerIdx=PEERS.indexOf(p);
-    html+='<div class="tile" data-spot="'+peerIdx+'" style="animation-delay:'+(peerIdx*0.09)+'s"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div>'
+    html+='<div class="tile" data-spot="'+peerIdx+'" style="animation-delay:'+(peerIdx*0.09)+'s"><div class="tile-head"><span class="tile-logo"><img src="'+p.logo+'" alt="" onerror="this.parentNode.style.display=\'none\'"></span><div><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div></div></div>'
       +'<div class="pv">$'+d.price.toFixed(2)+'</div>'
       +'<div class="cg '+(up?'up':'dn')+'">'+(up?'+':'')+pct.toFixed(2)+'%</div>'
       +'<canvas data-sym="'+p.s+'"></canvas></div>';
@@ -544,7 +549,7 @@ function renderSpotlight(idx){
   }
   var dots=''; for(var j=0;j<PEERS.length;j++) dots+='<div class="spot-dot'+(j===spotCur?' on':'')+'"></div>';
   body.innerHTML=
-    '<div class="spot-top"><div class="spot-head"><div><div class="spot-tk"><span class="pulse-dot"></span>Brand spotlight \u00B7 '+(spotCur+1)+' of '+PEERS.length+'</div><div class="spot-name">'+p.n+' ('+p.t+')</div></div>'
+    '<div class="spot-top"><div class="spot-head"><div style="display:flex;gap:22px;align-items:center"><span class="tile-logo spot-logo"><img src="'+p.logo+'" alt="" onerror="this.parentNode.style.display=\'none\'"></span><div><div class="spot-tk"><span class="pulse-dot"></span>Brand spotlight \u00B7 '+(spotCur+1)+' of '+PEERS.length+'</div><div class="spot-name">'+p.n+' ('+p.t+')</div></div></div>'
     +'<div><div class="spot-price">'+priceTxt+'</div><div style="text-align:right">'+chgHtml+'</div></div></div>'
     +'<div class="spot-chartwrap"><canvas id="spotChart"></canvas></div>'
     +'<div class="spot-stats">'+statsHtml+'</div></div>'
