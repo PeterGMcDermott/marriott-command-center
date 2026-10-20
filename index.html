@@ -61,6 +61,42 @@
   .stat .v{font-size:19px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
   .srcNote{font-size:11px;color:var(--dim);margin-top:auto;padding-top:14px}
 
+
+  /* Brand spotlight (expanded tile) */
+  .tile{cursor:pointer;transition:transform .35s ease,box-shadow .35s ease;animation:tileIn .7s ease both}
+  .tile:hover{transform:scale(1.03);box-shadow:0 10px 26px rgba(0,0,0,.12)}
+  @keyframes tileIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spotProgress{from{width:0%}to{width:100%}}
+  @keyframes pulseDot{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+  .scene{transform:scale(1.015)}
+  .scene.on{transform:scale(1);transition:opacity 1.4s ease,transform 1.4s ease}
+  #scene-spotlight .spot-top{flex:0 0 33%;display:flex;flex-direction:column;min-height:0;border-bottom:1px solid var(--line);padding-bottom:12px}
+  .spot-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .spot-tk{font-size:13px;letter-spacing:3px;font-weight:700;text-transform:uppercase}
+  .spot-name{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.1;margin-top:4px}
+  .spot-price{font-size:54px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;text-align:right}
+  .spot-chg{display:inline-block;font-size:15px;font-weight:700;margin-top:6px;padding:4px 10px;border-radius:8px}
+  .spot-chg.up{background:rgba(22,163,74,.12);color:#166534}
+  .spot-chg.down{background:rgba(220,38,38,.10);color:#991b1b}
+  .spot-chartwrap{flex:1;min-height:0;position:relative;margin-top:8px}
+  #spotChart{width:100%;height:100%;display:block}
+  .spot-stats{display:flex;gap:16px;font-size:13px;color:var(--dim);margin-top:8px;flex:none}
+  .spot-stats b{color:var(--txt);font-variant-numeric:tabular-nums}
+  .spot-news{flex:1;display:flex;flex-direction:column;padding-top:16px;min-height:0}
+  .spot-news .kicker{margin-bottom:12px}
+  .hl-card{background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--coral);border-radius:10px;padding:15px 16px;margin-bottom:12px;display:flex;gap:14px;opacity:0;animation:fadeUp .7s ease forwards}
+  .hl-num{font-size:22px;font-weight:800;color:var(--coral);font-variant-numeric:tabular-nums;line-height:1.2;flex:none}
+  .hl-h{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.35}
+  .hl-s{font-size:12px;color:var(--dim);margin-top:6px;letter-spacing:.4px;text-transform:uppercase}
+  .spot-foot{flex:none;margin-top:auto}
+  .spot-progress{height:4px;background:#E4E2DD;border-radius:2px;overflow:hidden;margin-bottom:10px}
+  .spot-progress-bar{height:100%;background:var(--coral);animation:spotProgress 12s linear forwards}
+  .spot-dots{display:flex;gap:8px;justify-content:center}
+  .spot-dot{width:26px;height:4px;border-radius:2px;background:#D8D6D0}
+  .spot-dot.on{background:var(--coral)}
+  .pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-right:7px;animation:pulseDot 1.6s ease infinite;vertical-align:middle}
+
   /* News scene */
   #newsImg{width:100%;height:230px;object-fit:cover;border-radius:12px;margin-bottom:16px;opacity:0;transition:opacity .6s ease;background:var(--panel2)}
   #newsBig{font-family:var(--serif);font-size:38px;font-weight:600;line-height:1.3;transition:opacity .6s ease}
@@ -131,11 +167,17 @@
       <div class="subview" id="sv-tiles">
         <div class="charttitle">Hospitality watch</div>
         <div class="tilegrid" id="tileGrid"><div class="tiny">loading quotes&hellip;</div></div>
-        <div class="tiny" style="margin-top:8px">Quotes via Yahoo Finance · refreshes every 15 min</div>
+        <div class="tiny" style="margin-top:8px">Quotes via Yahoo Finance · refreshes every 15 min · Tap a tile to expand it</div>
       </div>
     </div>
     <div class="subdots" id="subDots"></div>
     <div class="srcNote" id="srcNote">Quotes as of Oct 19, 2026 close. Live refresh via Yahoo Finance.</div>
+  </section>
+
+  
+  <!-- SCENE 1B: BRAND SPOTLIGHT (expanded tile: chart top third + 3 headlines) -->
+  <section class="scene" id="scene-spotlight">
+    <div id="spotBody" style="display:flex;flex-direction:column;height:100%;min-height:0"></div>
   </section>
 
   <!-- SCENE 2: NEWS -->
@@ -174,7 +216,7 @@
   <button id="btnVideo">&#127916; Video</button>
   <button id="btnFull">Fullscreen</button>
 </div>
-<div class="hint">Keys: M = meeting mode &middot; Space = pause &middot; F = fullscreen &middot; Scenes rotate every 40s</div>
+<div class="hint">Keys: M = meeting mode &middot; Space = pause &middot; F = fullscreen &middot; Stock &middot; Brand spotlights &middot; News &middot; Video rotate automatically</div>
 
 <script>
 /* ---------- Clock (America/Chicago) ---------- */
@@ -255,12 +297,15 @@ function renderTiles(){
       return;
     }
     var diff=d.price-d.prev,pct=100*diff/d.prev,up=diff>=0;
-    html+='<div class="tile"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div>'
+    var peerIdx=PEERS.indexOf(p);
+    html+='<div class="tile" data-spot="'+peerIdx+'" style="animation-delay:'+(peerIdx*0.09)+'s"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div>'
       +'<div class="pv">$'+d.price.toFixed(2)+'</div>'
       +'<div class="cg '+(up?'up':'dn')+'">'+(up?'+':'')+pct.toFixed(2)+'%</div>'
       +'<canvas data-sym="'+p.s+'"></canvas></div>';
   });
   grid.innerHTML=html;
+  var tiles=grid.querySelectorAll('.tile[data-spot]');
+  for(var ti=0;ti<tiles.length;ti++){tiles[ti].addEventListener('click',function(){spotCur=parseInt(this.getAttribute('data-spot'),10)||0;goScene(scenes.indexOf('scene-spotlight'));});}
   var cv=grid.querySelectorAll('canvas');
   for(var i=0;i<cv.length;i++){
     var d=peerData[cv[i].getAttribute('data-sym')];
@@ -383,6 +428,107 @@ function animateSpark(){
   requestAnimationFrame(step);
 }
 
+
+/* ---------- Brand spotlight: expanded tile ----------
+   Top third = animated 90-day price chart for one brand.
+   Below = 3 headlines for that brand. Cycles all 6 brands, 12s each.
+   Headlines curated Oct 20, 2026 from company / market coverage. */
+var BRAND_NEWS={
+  'MAR':[
+    {h:'Freedom Broker initiates coverage with a Buy rating and a $408 price target',s:'MarketBeat \u00B7 Oct 15, 2026'},
+    {h:'Eight hotels and 700+ rooms in the Netherlands to join \u2014 six for Series by Marriott, two for Tribute Portfolio',s:'Company announcement \u00B7 Oct 5, 2026'},
+    {h:'First City Express in South Asia opens in Udaipur, alongside the first Marriott Hotels property in Jakarta',s:'Expansion \u00B7 Oct 2026'}
+  ],
+  'HLT':[
+    {h:'Hilton signs two Bengaluru airport hotels \u2014 600 rooms and a second Conrad for the city, opening 2030',s:'Company announcement \u00B7 Oct 6, 2026'},
+    {h:'Q3 results land Oct 27 \u2014 analysts expect $2.36 a share on $3.37B in revenue',s:'Earnings preview \u00B7 Oct 20, 2026'},
+    {h:'Morgan Stanley lifts its target to $336; former Uber engineering chief Jeff Moore joins as CTO on Oct 26',s:'Analysts & leadership \u00B7 Oct 2026'}
+  ],
+  'IHG':[
+    {h:'Hotel Indigo opens its 200th hotel, a milestone for IHG\u2019s luxury and lifestyle brand',s:'LODGING Magazine \u00B7 Oct 5, 2026'},
+    {h:'First-half RevPAR grew 4.1%, adjusted EPS rose 13% and net system growth hit 5.0%',s:'H1 2026 results \u00B7 Aug 2026'},
+    {h:'Q3 trading update due Oct 22, with the buyback still running \u2014 19,581 shares repurchased on Oct 14',s:'Market coverage \u00B7 Oct 2026'}
+  ],
+  'H':[
+    {h:'Pipeline tops 154,000 rooms, with 300+ U.S. submarkets targeted and 70+ Hyatt Studios hotels in development',s:'Development update \u00B7 Oct 6, 2026'},
+    {h:'Q3 results due before the open on Oct 29 \u2014 Q2 EPS of $1.12 beat the $0.91 consensus',s:'Earnings preview \u00B7 Oct 2026'},
+    {h:'World of Hyatt swaps its new-hotel bonus for 2X points on eligible spend, capped at 25,000 points per stay',s:'Loyalty \u00B7 Oct 1, 2026'}
+  ],
+  'WH':[
+    {h:'Q3 results due after the close on Oct 21 \u2014 consensus sits near $1.31 a share',s:'Earnings preview \u00B7 Oct 20, 2026'},
+    {h:'Zacks expects Q3 earnings to dip 10.3% year over year, even as revenue rises 7.6% to about $411M',s:'Zacks \u00B7 Oct 14, 2026'},
+    {h:'Q2 beat in July: $1.48 a share against a $1.41 consensus, from one of the world\u2019s largest hotel franchisors',s:'Q2 2026 results \u00B7 Jul 2026'}
+  ],
+  'CHH':[
+    {h:'Choice to acquire Harvest Hosts for $130M \u2014 11,200+ RV host sites at wineries, farms and breweries',s:'PR Newswire \u00B7 Sep 30, 2026'},
+    {h:'Q2 adjusted EPS of $2.02 beat consensus; full-year EBITDA outlook raised to $635M\u2013$650M',s:'Q2 2026 results \u00B7 Aug 2026'},
+    {h:'Choice Privileges membership up 7% to 77 million; U.S. openings rose 27% and franchise signings 30% in Q2',s:'Q2 2026 results \u00B7 Aug 2026'}
+  ]
+};
+var spotCur=0, spotTimer=null, spotRAF=null;
+function drawSpotChart(prog){
+  var c=document.getElementById('spotChart'); if(!c||!c.offsetWidth||!c.offsetHeight) return;
+  var p=PEERS[spotCur], d=peerData[p.s]; if(!d||!d.hist||d.hist.length<5) return;
+  var data=d.hist, ctx=c.getContext('2d');
+  var W=c.width=c.offsetWidth*2, H=c.height=c.offsetHeight*2;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,.08)'; ctx.lineWidth=1;
+  for(var g=1;g<4;g++){ctx.beginPath();ctx.moveTo(0,H*g/4);ctx.lineTo(W,H*g/4);ctx.stroke();}
+  var up=data[data.length-1]>=data[0];
+  var color=up?'#16a34a':'#dc2626';
+  var min=Math.min.apply(null,data), max=Math.max.apply(null,data); if(max===min)max=min+1;
+  function X(i){return 16+i*(W-32)/(data.length-1);}
+  function Y(v){return H-28-(v-min)*(H-56)/(max-min);}
+  var n=Math.max(2,Math.floor(data.length*prog));
+  ctx.strokeStyle=color; ctx.lineWidth=5; ctx.lineJoin='round'; ctx.beginPath();
+  for(var i=0;i<n;i++){i?ctx.lineTo(X(i),Y(data[i])):ctx.moveTo(X(i),Y(data[i]));}
+  ctx.stroke();
+  ctx.lineTo(X(n-1),H); ctx.lineTo(X(0),H); ctx.closePath();
+  var fg=ctx.createLinearGradient(0,0,0,H);
+  fg.addColorStop(0,up?'rgba(22,163,74,.28)':'rgba(220,38,38,.22)'); fg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=fg; ctx.fill();
+  if(prog>=1){ctx.beginPath();ctx.arc(X(data.length-1),Y(data[data.length-1]),10,0,7);ctx.fillStyle=color;ctx.fill();}
+}
+function animateSpotChart(){
+  if(spotRAF)cancelAnimationFrame(spotRAF);
+  var t0=null;
+  function step(ts){if(!t0)t0=ts;var pr=Math.min(1,(ts-t0)/1400);drawSpotChart(pr);if(pr<1)spotRAF=requestAnimationFrame(step);}
+  spotRAF=requestAnimationFrame(step);
+}
+function renderSpotlight(idx){
+  spotCur=((idx%PEERS.length)+PEERS.length)%PEERS.length;
+  var p=PEERS[spotCur], d=peerData[p.s], body=document.getElementById('spotBody');
+  if(!body) return;
+  var priceTxt='\u2014', chgHtml='', statsHtml='<span>90-day chart loading\u2026</span>';
+  if(d&&d.price>0){
+    var diff=d.price-d.prev, pct=100*diff/d.prev, up=diff>=0;
+    priceTxt='$'+d.price.toFixed(2);
+    chgHtml='<span class="spot-chg '+(up?'up':'down')+'">'+(up?'+':'')+'$'+Math.abs(diff).toFixed(2)+' ('+(pct>=0?'+':'')+pct.toFixed(2)+'%)</span>';
+    if(d.hist&&d.hist.length>5){
+      var f=d.hist[0], l=d.hist[d.hist.length-1], pc=100*(l-f)/f;
+      var hi=Math.max.apply(null,d.hist), lo=Math.min.apply(null,d.hist);
+      statsHtml='<span>90d: <b style="color:'+(pc>=0?'var(--up)':'var(--down)')+'">'+(pc>=0?'+':'')+pc.toFixed(1)+'%</b></span><span>High <b>$'+hi.toFixed(2)+'</b></span><span>Low <b>$'+lo.toFixed(2)+'</b></span><span>Open <b>$'+(d.open?d.open.toFixed(2):'\u2014')+'</b></span>';
+    }
+  }
+  var news=BRAND_NEWS[p.t]||[], cards='';
+  for(var i=0;i<news.length;i++){
+    cards+='<div class="hl-card" style="animation-delay:'+(0.25+i*0.28)+'s"><div class="hl-num">'+(i+1)+'</div><div><div class="hl-h">'+news[i].h+'</div><div class="hl-s">'+news[i].s+'</div></div></div>';
+  }
+  var dots=''; for(var j=0;j<PEERS.length;j++) dots+='<div class="spot-dot'+(j===spotCur?' on':'')+'"></div>';
+  body.innerHTML=
+    '<div class="spot-top"><div class="spot-head"><div><div class="spot-tk"><span class="pulse-dot"></span>Brand spotlight \u00B7 '+(spotCur+1)+' of '+PEERS.length+'</div><div class="spot-name">'+p.n+' ('+p.t+')</div></div>'
+    +'<div><div class="spot-price">'+priceTxt+'</div><div style="text-align:right">'+chgHtml+'</div></div></div>'
+    +'<div class="spot-chartwrap"><canvas id="spotChart"></canvas></div>'
+    +'<div class="spot-stats">'+statsHtml+'</div></div>'
+    +'<div class="spot-news"><div class="kicker">Latest on '+p.n+'</div>'+cards
+    +'<div class="spot-foot"><div class="spot-progress"><div class="spot-progress-bar"></div></div><div class="spot-dots">'+dots+'</div>'
+    +'<div class="tiny" style="text-align:center;margin-top:8px">Headlines curated Oct 20, 2026 \u00B7 Prices via Yahoo Finance, baked Oct 19 close as fallback</div></div></div>';
+  animateSpotChart();
+}
+function goSpot(i){renderSpotlight(i);}
+function startSpotlight(){renderSpotlight(spotCur);clearInterval(spotTimer);spotTimer=setInterval(function(){renderSpotlight(spotCur+1);},12000);}
+function stopSpotlight(){clearInterval(spotTimer);if(spotRAF)cancelAnimationFrame(spotRAF);}
+
 /* ---------- News cycler ---------- */
 var NEWS=[
   {h:'Jefferies lifts its Marriott price target to $429, Goldman Sachs to $406, ahead of Q3 earnings on Nov 2',s:'Analyst roundup · Oct 17, 2026',img:'https://www.marketbeat.com/logos/marriott-international-inc-logo.png?v=20200227112206'},
@@ -462,16 +608,28 @@ document.getElementById('videoReset').addEventListener('click',function(){
   showVideo(DEFAULT_VIDEO);refreshVideoLabel();document.getElementById('videoPanel').hidden=true;
 });
 /* ---------- Scene rotation + meeting mode ---------- */
-var scenes=['scene-stock','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
+var scenes=['scene-stock','scene-spotlight','scene-news','scene-video'],cur=0,paused=false,rotTimer=null;
+var SCENE_DUR={'scene-stock':36000,'scene-spotlight':72000,'scene-news':36000,'scene-video':40000};
 function goScene(i){
-  cur=i;
-  scenes.forEach(function(id,j){document.getElementById(id).className=document.getElementById(id).className.replace(/ ?\bon\b/g,'')+(j===i?' on':'');});
-  if(scenes[i]==='scene-stock'){startStock();animateSpark();}else{stopStock();}
-  if(scenes[i]==='scene-news'){newsCycle();clearInterval(newsTimer);newsTimer=setInterval(newsCycle,9000);}
+  cur=((i%scenes.length)+scenes.length)%scenes.length;
+  scenes.forEach(function(id,j){var el=document.getElementById(id);el.className=el.className.replace(/ ?\bon\b/g,'')+(j===cur?' on':'');});
+  if(scenes[cur]==='scene-stock'){startStock();animateSpark();}else{stopStock();}
+  if(scenes[cur]==='scene-spotlight'){startSpotlight();}else{stopSpotlight();}
+  if(scenes[cur]==='scene-news'){newsCycle();clearInterval(newsTimer);newsTimer=setInterval(newsCycle,9000);}
   else clearInterval(newsTimer);
+  scheduleRotation();
 }
-function nextScene(){goScene((cur+1)%scenes.length);}
-function armRotation(){clearInterval(rotTimer);if(!paused)rotTimer=setInterval(function(){if(!document.body.classList.contains('meeting'))nextScene();},40000);}
+function nextScene(){goScene(cur+1);}
+function scheduleRotation(){
+  clearTimeout(rotTimer);
+  if(paused) return;
+  var dur=SCENE_DUR[scenes[cur]]||40000;
+  rotTimer=setTimeout(function(){
+    if(document.body.classList.contains('meeting')){scheduleRotation();return;}
+    nextScene();
+  },dur);
+}
+function armRotation(){scheduleRotation();}
 armRotation();
 
 var btnPause=document.getElementById('btnPause');
@@ -482,10 +640,7 @@ var btnMeeting=document.getElementById('btnMeeting');
 function toggleMeeting(){
   var on=document.body.classList.toggle('meeting');
   btnMeeting.classList.toggle('active',on);
-  if(on){ /* park on the calmest scene */
-    var hasVideo=!!document.getElementById('ytFrame');
-    goScene(hasVideo?2:0);
-  }
+  if(on){ goScene(0); } else { scheduleRotation(); }
 }
 btnMeeting.addEventListener('click',toggleMeeting);
 
