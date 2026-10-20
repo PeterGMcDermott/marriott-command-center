@@ -32,6 +32,24 @@
   .chg.up{background:rgba(74,222,128,.14);color:var(--up)}
   .chg.down{background:rgba(248,113,113,.14);color:var(--down)}
   #spark{width:100%;height:170px;margin-top:18px}
+  #stockBody{position:relative;flex:1;min-height:0}
+  .subview{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;display:flex;flex-direction:column}
+  .subview.on{opacity:1;pointer-events:auto}
+  .subdots{display:flex;gap:8px;justify-content:center;padding:8px 0;flex:none}
+  .subdot{width:22px;height:4px;border-radius:2px;background:var(--line)}
+  .subdot.on{background:var(--coral)}
+  .charttitle{font-size:22px;font-weight:800;margin-bottom:10px}
+  #bigchart{width:100%;flex:1;min-height:0}
+  .chartstats{display:flex;gap:16px;margin-top:10px;font-size:14px;color:var(--dim)}
+  .chartstats b{color:var(--txt);font-variant-numeric:tabular-nums}
+  .tilegrid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px;flex:1;min-height:0}
+  .tile{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;min-width:0}
+  .tile .tk{font-size:16px;font-weight:800}
+  .tile .nm{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tile .pv{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .tile .cg{font-size:12px;font-weight:700;margin-top:1px}
+  .tile .cg.up{color:var(--up)} .tile .cg.dn{color:var(--down)}
+  .tile canvas{width:100%;height:44px;margin-top:auto}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
   .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .stat .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
@@ -82,20 +100,35 @@
 
 <div id="stage">
 
-  <!-- SCENE 1: STOCK -->
+  <!-- SCENE 1: STOCK (sub-views cycle every 10s) -->
   <section class="scene on" id="scene-stock">
     <div class="kicker">Marriott International &middot; NASDAQ: MAR</div>
-    <div class="price" id="price">$390.70</div>
-    <div><span class="chg up" id="chg">+$2.65 (+0.68%)</span></div>
-    <canvas id="spark"></canvas>
-    <div class="grid">
-      <div class="stat"><div class="k">Open</div><div class="v" id="sOpen">388.40</div></div>
-      <div class="stat"><div class="k">Prev close</div><div class="v" id="sPrev">388.05</div></div>
-      <div class="stat"><div class="k">Day high</div><div class="v" id="sHigh">392.77</div></div>
-      <div class="stat"><div class="k">Day low</div><div class="v" id="sLow">386.00</div></div>
-      <div class="stat"><div class="k">Market cap</div><div class="v">$101.2B</div></div>
-      <div class="stat"><div class="k">52-wk range</div><div class="v">256.76 &ndash; 410.98</div></div>
+    <div id="stockBody">
+      <div class="subview on" id="sv-hero">
+        <div class="price" id="price">$390.70</div>
+        <div><span class="chg up" id="chg">+$2.65 (+0.68%)</span></div>
+        <canvas id="spark"></canvas>
+        <div class="grid">
+          <div class="stat"><div class="k">Open</div><div class="v" id="sOpen">388.40</div></div>
+          <div class="stat"><div class="k">Prev close</div><div class="v" id="sPrev">388.05</div></div>
+          <div class="stat"><div class="k">Day high</div><div class="v" id="sHigh">392.77</div></div>
+          <div class="stat"><div class="k">Day low</div><div class="v" id="sLow">386.00</div></div>
+          <div class="stat"><div class="k">Market cap</div><div class="v">$101.2B</div></div>
+          <div class="stat"><div class="k">52-wk range</div><div class="v">256.76 &ndash; 410.98</div></div>
+        </div>
+      </div>
+      <div class="subview" id="sv-chart">
+        <div class="charttitle">MAR &middot; 90-day performance</div>
+        <canvas id="bigchart"></canvas>
+        <div class="chartstats" id="chartStats"><span>loading&hellip;</span></div>
+      </div>
+      <div class="subview" id="sv-tiles">
+        <div class="charttitle">Hospitality watch</div>
+        <div class="tilegrid" id="tileGrid"><div class="tiny">loading quotes&hellip;</div></div>
+        <div class="tiny" style="margin-top:8px">Quotes via Stooq · refreshes every 15 min</div>
+      </div>
     </div>
+    <div class="subdots" id="subDots"></div>
     <div class="srcNote" id="srcNote">Quote as of Oct 19, 2026. Live retry via Stooq every 15 min.</div>
   </section>
 
@@ -165,6 +198,133 @@ var tapeItems=[
   document.getElementById('tapeInner').innerHTML=html;
 })();
 
+/* ---------- Peers & sub-view cycler ---------- */
+var PEERS=[
+  {s:'mar.us',t:'MAR',n:'Marriott Intl'},
+  {s:'hlt.us',t:'HLT',n:'Hilton'},
+  {s:'ihg.us',t:'IHG',n:'InterContinental'},
+  {s:'h.us',t:'H',n:'Hyatt'},
+  {s:'wh.us',t:'WH',n:'Wyndham'},
+  {s:'chh.us',t:'CHH',n:'Choice Hotels'}
+];
+var peerData={}; /* sym -> {price, prev, hist:[closes]} */
+var BAKED_HIST={}; /* filled below if the live fetch fails */
+function parseCsvRows(t){
+  var lines=t.trim().split('\n');lines.shift();
+  return lines.map(function(l){return l.split(',');});
+}
+function loadPeers(){
+  var syms=PEERS.map(function(p){return p.s;}).join(',');
+  fetch('https://stooq.com/q/l/?s='+syms+'&f=sd2t2ohlcv&h&e=csv').then(function(r){return r.text();}).then(function(t){
+    parseCsvRows(t).forEach(function(row,i){
+      var p=PEERS[i];if(!p||!row[6])return;
+      var price=parseFloat(row[6]),prev=parseFloat(row[7]);
+      if(!(price>0))return;
+      peerData[p.s]={price:price,prev:prev,hist:(peerData[p.s]&&peerData[p.s].hist)||[]};
+    });
+    renderTiles();
+  }).catch(function(){});
+  PEERS.forEach(function(p){
+    fetch('https://stooq.com/q/d/l/?s='+p.s+'&d1=20260715&d2=20261019&i=d').then(function(r){return r.text();}).then(function(t){
+      var rows=parseCsvRows(t).filter(function(rw){return rw.length>4&&parseFloat(rw[4])>0;});
+      var closes=rows.slice(-90).map(function(rw){return parseFloat(rw[4]);});
+      if(closes.length>5){
+        peerData[p.s]=peerData[p.s]||{};
+        peerData[p.s].hist=closes;
+        if(p.s==='mar.us'){drawBigChart();}
+        renderTiles();
+      }
+    }).catch(function(){});
+  });
+}
+function drawLine(ctx,data,color,W,H,pad){
+  pad=pad||10;
+  var min=Math.min.apply(null,data),max=Math.max.apply(null,data);
+  if(max===min){max=min+1;}
+  function X(i){return pad+i*(W-pad*2)/(data.length-1);}
+  function Y(v){return H-pad*2-(v-min)*(H-pad*4)/(max-min);}
+  ctx.strokeStyle=color;ctx.lineWidth=Math.max(3,W/160);ctx.lineJoin='round';ctx.beginPath();
+  for(var i=0;i<data.length;i++){i?ctx.lineTo(X(i),Y(data[i])):ctx.moveTo(X(i),Y(data[i]));}
+  ctx.stroke();
+  return {X:X,Y:Y,min:min,max:max};
+}
+function drawSparkTile(canvas,data,up){
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width=canvas.offsetWidth*2,H=canvas.height=88;
+  if(!data||data.length<3)return;
+  var color=up?'#4ade80':'#f87171';
+  var g=drawLine(ctx,data,color,W,H,6);
+  ctx.lineTo(g.X(data.length-1),H);ctx.lineTo(g.X(0),H);ctx.closePath();
+  var fg=ctx.createLinearGradient(0,0,0,H);
+  fg.addColorStop(0,up?'rgba(74,222,128,.35)':'rgba(248,113,113,.35)');fg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=fg;ctx.fill();
+}
+function renderTiles(){
+  var grid=document.getElementById('tileGrid');
+  var html='';
+  PEERS.forEach(function(p){
+    var d=peerData[p.s];
+    if(!d||!(d.price>0)){
+      html+='<div class="tile"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div><div class="pv" style="color:var(--dim)">—</div></div>';
+      return;
+    }
+    var diff=d.price-d.prev,pct=100*diff/d.prev,up=diff>=0;
+    html+='<div class="tile"><div class="tk">'+p.t+'</div><div class="nm">'+p.n+'</div>'
+      +'<div class="pv">$'+d.price.toFixed(2)+'</div>'
+      +'<div class="cg '+(up?'up':'dn')+'">'+(up?'+':'')+pct.toFixed(2)+'%</div>'
+      +'<canvas data-sym="'+p.s+'"></canvas></div>';
+  });
+  grid.innerHTML=html;
+  var cv=grid.querySelectorAll('canvas');
+  for(var i=0;i<cv.length;i++){
+    var d=peerData[cv[i].getAttribute('data-sym')];
+    if(d)drawSparkTile(cv[i],d.hist.length>3?d.hist:[d.prev,d.price],(d.price-d.prev)>=0);
+  }
+}
+function drawBigChart(){
+  var c=document.getElementById('bigchart');if(!c||!c.offsetWidth)return;
+  var dd=peerData['mar.us'];
+  var hist=(dd&&dd.hist&&dd.hist.length>5)?dd.hist:null;
+  var periodLabel='90-day performance',statLabel='90d';
+  if(!hist){hist=sparkData;periodLabel='30-day trend (live history pending)';statLabel='30d';}
+  var titleEl=document.querySelector('#sv-chart .charttitle');
+  if(titleEl)titleEl.innerHTML='MAR &middot; '+periodLabel;
+  if(!hist||hist.length<5)return;
+  var ctx=c.getContext('2d');
+  var W=c.width=c.offsetWidth*2,H=c.height=c.offsetHeight*2;
+  ctx.clearRect(0,0,W,H);
+  /* gridlines */
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+  for(var g=1;g<4;g++){ctx.beginPath();ctx.moveTo(0,H*g/4);ctx.lineTo(W,H*g/4);ctx.stroke();}
+  var r=drawLine(ctx,hist,'#e0566e',W,H,20);
+  ctx.lineTo(r.X(hist.length-1),H);ctx.lineTo(r.X(0),H);ctx.closePath();
+  var fg=ctx.createLinearGradient(0,0,0,H);
+  fg.addColorStop(0,'rgba(224,86,110,.4)');fg.addColorStop(1,'rgba(224,86,110,0)');
+  ctx.fillStyle=fg;ctx.fill();
+  ctx.beginPath();ctx.arc(r.X(hist.length-1),r.Y(hist[hist.length-1]),9,0,7);ctx.fillStyle='#e0566e';ctx.fill();
+  /* stats */
+  var first=hist[0],last=hist[hist.length-1],pct=100*(last-first)/first;
+  document.getElementById('chartStats').innerHTML=
+    '<span>'+statLabel+': <b class="'+(pct>=0?'':'')+'" style="color:'+(pct>=0?'var(--up)':'var(--down)')+'">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</b></span>'
+    +'<span>High <b>$'+r.max.toFixed(2)+'</b></span>'
+    +'<span>Low <b>$'+r.min.toFixed(2)+'</b></span>';
+}
+/* sub-view cycler: hero -> chart -> tiles, every 10s */
+var subviews=['sv-hero','sv-chart','sv-tiles'],subCur=0,subTimer=null;
+var subDotsEl=document.getElementById('subDots');
+subviews.forEach(function(){var d=document.createElement('div');d.className='subdot';subDotsEl.appendChild(d);});
+function goSub(i){
+  subCur=i;
+  subviews.forEach(function(id,j){
+    document.getElementById(id).className='subview'+(j===i?' on':'');
+    subDotsEl.children[j].className='subdot'+(j===i?' on':'');
+  });
+  if(i===1)drawBigChart();
+  if(i===2)renderTiles();
+}
+function startStock(){goSub(0);clearInterval(subTimer);subTimer=setInterval(function(){goSub((subCur+1)%subviews.length);},10000);}
+function stopStock(){clearInterval(subTimer);}
+
 /* ---------- Stock: live Stooq retry, fallback baked ---------- */
 function loadStock(){
   fetch('https://stooq.com/q/l/?s=mar.us&f=sd2t2ohlcv&h&e=csv')
@@ -186,6 +346,7 @@ function loadStock(){
     }).catch(function(){});
 }
 loadStock();setInterval(loadStock,15*60*1000);
+loadPeers();setInterval(loadPeers,15*60*1000);
 
 /* ---------- Sparkline: progressive draw ---------- */
 var sparkData=[351.5,354.2,352.8,357.1,360.4,358.9,361.1,365.9,368.2,366.7,371.3,375.0,373.6,378.9,381.2,379.8,385.4,383.1,388.1,390.7];
@@ -293,7 +454,7 @@ var scenes=['scene-stock','scene-news','scene-video'],cur=0,paused=false,rotTime
 function goScene(i){
   cur=i;
   scenes.forEach(function(id,j){document.getElementById(id).className=document.getElementById(id).className.replace(/ ?\bon\b/g,'')+(j===i?' on':'');});
-  if(scenes[i]==='scene-stock')animateSpark();
+  if(scenes[i]==='scene-stock'){startStock();animateSpark();}else{stopStock();}
   if(scenes[i]==='scene-news'){newsCycle();clearInterval(newsTimer);newsTimer=setInterval(newsCycle,9000);}
   else clearInterval(newsTimer);
 }
@@ -327,7 +488,7 @@ document.addEventListener('keydown',function(e){
 
 /* Kiosk hygiene: full reload every 12h so a stick never goes stale */
 setTimeout(function(){location.reload();},12*60*60*1000);
-animateSpark();
+animateSpark();startStock();
 </script>
 </body>
 </html>
