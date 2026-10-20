@@ -57,6 +57,7 @@
   .srcNote{font-size:11px;color:var(--dim);margin-top:auto;padding-top:14px}
 
   /* News scene */
+  #newsImg{width:100%;height:230px;object-fit:cover;border-radius:12px;margin-bottom:16px;opacity:0;transition:opacity .6s ease;background:var(--panel2)}
   #newsBig{font-size:38px;font-weight:700;line-height:1.3;transition:opacity .6s ease}
   #newsSrc{font-size:14px;color:var(--dim);margin-top:16px;transition:opacity .6s ease}
   .dots{margin-top:auto;display:flex;gap:8px}
@@ -125,16 +126,17 @@
       <div class="subview" id="sv-tiles">
         <div class="charttitle">Hospitality watch</div>
         <div class="tilegrid" id="tileGrid"><div class="tiny">loading quotes&hellip;</div></div>
-        <div class="tiny" style="margin-top:8px">Quotes via Stooq · refreshes every 15 min</div>
+        <div class="tiny" style="margin-top:8px">Quotes via Yahoo Finance · refreshes every 15 min</div>
       </div>
     </div>
     <div class="subdots" id="subDots"></div>
-    <div class="srcNote" id="srcNote">Quote as of Oct 19, 2026. Live retry via Stooq every 15 min.</div>
+    <div class="srcNote" id="srcNote">Quote as of Oct 19, 2026. Live via Yahoo Finance, refreshes every 15 min.</div>
   </section>
 
   <!-- SCENE 2: NEWS -->
   <section class="scene" id="scene-news">
     <div class="kicker">Marriott in the news</div>
+    <img id="newsImg" alt="" referrerpolicy="no-referrer">
     <div id="newsBig"></div>
     <div id="newsSrc"></div>
     <div class="dots" id="newsDots"></div>
@@ -213,30 +215,7 @@ function parseCsvRows(t){
   var lines=t.trim().split('\n');lines.shift();
   return lines.map(function(l){return l.split(',');});
 }
-function loadPeers(){
-  var syms=PEERS.map(function(p){return p.s;}).join(',');
-  fetch('https://stooq.com/q/l/?s='+syms+'&f=sd2t2ohlcv&h&e=csv').then(function(r){return r.text();}).then(function(t){
-    parseCsvRows(t).forEach(function(row,i){
-      var p=PEERS[i];if(!p||!row[6])return;
-      var price=parseFloat(row[6]),prev=parseFloat(row[7]);
-      if(!(price>0))return;
-      peerData[p.s]={price:price,prev:prev,hist:(peerData[p.s]&&peerData[p.s].hist)||[]};
-    });
-    renderTiles();
-  }).catch(function(){});
-  PEERS.forEach(function(p){
-    fetch('https://stooq.com/q/d/l/?s='+p.s+'&d1=20260715&d2=20261019&i=d').then(function(r){return r.text();}).then(function(t){
-      var rows=parseCsvRows(t).filter(function(rw){return rw.length>4&&parseFloat(rw[4])>0;});
-      var closes=rows.slice(-90).map(function(rw){return parseFloat(rw[4]);});
-      if(closes.length>5){
-        peerData[p.s]=peerData[p.s]||{};
-        peerData[p.s].hist=closes;
-        if(p.s==='mar.us'){drawBigChart();}
-        renderTiles();
-      }
-    }).catch(function(){});
-  });
-}
+/* loadPeers retired: unified Yahoo loader above */
 function drawLine(ctx,data,color,W,H,pad){
   pad=pad||10;
   var min=Math.min.apply(null,data),max=Math.max.apply(null,data);
@@ -296,12 +275,13 @@ function drawBigChart(){
   /* gridlines */
   ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
   for(var g=1;g<4;g++){ctx.beginPath();ctx.moveTo(0,H*g/4);ctx.lineTo(W,H*g/4);ctx.stroke();}
-  var r=drawLine(ctx,hist,'#e0566e',W,H,20);
+  var chartUp=hist[hist.length-1]>=hist[0];
+  var r=drawLine(ctx,hist,chartUp?'#4ade80':'#f87171',W,H,20);
   ctx.lineTo(r.X(hist.length-1),H);ctx.lineTo(r.X(0),H);ctx.closePath();
   var fg=ctx.createLinearGradient(0,0,0,H);
-  fg.addColorStop(0,'rgba(224,86,110,.4)');fg.addColorStop(1,'rgba(224,86,110,0)');
+  fg.addColorStop(0,chartUp?'rgba(74,222,128,.35)':'rgba(248,113,113,.35)');fg.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=fg;ctx.fill();
-  ctx.beginPath();ctx.arc(r.X(hist.length-1),r.Y(hist[hist.length-1]),9,0,7);ctx.fillStyle='#e0566e';ctx.fill();
+  ctx.beginPath();ctx.arc(r.X(hist.length-1),r.Y(hist[hist.length-1]),9,0,7);ctx.fillStyle=chartUp?'#4ade80':'#f87171';ctx.fill();
   /* stats */
   var first=hist[0],last=hist[hist.length-1],pct=100*(last-first)/first;
   document.getElementById('chartStats').innerHTML=
@@ -325,28 +305,44 @@ function goSub(i){
 function startStock(){goSub(0);clearInterval(subTimer);subTimer=setInterval(function(){goSub((subCur+1)%subviews.length);},10000);}
 function stopStock(){clearInterval(subTimer);}
 
-/* ---------- Stock: live Stooq retry, fallback baked ---------- */
-function loadStock(){
-  fetch('https://stooq.com/q/l/?s=mar.us&f=sd2t2ohlcv&h&e=csv')
-    .then(function(r){return r.text();}).then(function(t){
-      var p=t.trim().split('\n')[1].split(',');
-      var close=parseFloat(p[6]),prev=parseFloat(p[7]);
-      if(close>0){
-        var diff=close-prev,pct=100*diff/prev;
-        document.getElementById('price').textContent='$'+close.toFixed(2);
+/* ---------- Market data: Yahoo Finance (one call per symbol) ---------- */
+function yahooChart(ticker){
+  return fetch('https://query1.finance.yahoo.com/v8/finance/chart/'+ticker+'?interval=1d&range=3mo')
+    .then(function(r){return r.json();}).then(function(d){
+      var res=d.chart.result[0], q=res.indicators.quote[0];
+      var closes=[],opens=[],highs=[],lows=[];
+      for(var i=0;i<q.close.length;i++){
+        if(q.close[i]){closes.push(q.close[i]);opens.push(q.open[i]);highs.push(q.high[i]);lows.push(q.low[i]);}
+      }
+      var last=closes.length-1;
+      return {price:res.meta.regularMarketPrice||closes[last],prev:closes[last-1],
+              open:opens[last],high:highs[last],low:lows[last],hist:closes};
+    });
+}
+function loadAll(){
+  PEERS.forEach(function(p){
+    yahooChart(p.t).then(function(d){
+      peerData[p.s]=d;
+      if(p.t==='MAR'){
+        var diff=d.price-d.prev,pct=100*diff/d.prev;
+        document.getElementById('price').textContent='$'+d.price.toFixed(2);
         var el=document.getElementById('chg');
         el.textContent=(diff>=0?'+$':'-$')+Math.abs(diff).toFixed(2)+' ('+(pct>=0?'+':'')+pct.toFixed(2)+'%)';
         el.className='chg '+(diff>=0?'up':'down');
-        document.getElementById('sOpen').textContent=parseFloat(p[3]).toFixed(2);
-        document.getElementById('sHigh').textContent=parseFloat(p[4]).toFixed(2);
-        document.getElementById('sLow').textContent=parseFloat(p[5]).toFixed(2);
-        document.getElementById('sPrev').textContent=prev.toFixed(2);
-        document.getElementById('srcNote').textContent='Live quote via Stooq, updated '+new Date().toLocaleTimeString('en-US',{timeZone:'America/Chicago'});
+        document.getElementById('sOpen').textContent=d.open.toFixed(2);
+        document.getElementById('sHigh').textContent=d.high.toFixed(2);
+        document.getElementById('sLow').textContent=d.low.toFixed(2);
+        document.getElementById('sPrev').textContent=d.prev.toFixed(2);
+        document.getElementById('srcNote').textContent='Live via Yahoo Finance, updated '+new Date().toLocaleTimeString('en-US',{timeZone:'America/Chicago'})+' CT. Refreshes every 15 min.';
+        sparkData=d.hist.slice(-30);
+        animateSpark();
+        drawBigChart();
       }
+      renderTiles();
     }).catch(function(){});
+  });
 }
-loadStock();setInterval(loadStock,15*60*1000);
-loadPeers();setInterval(loadPeers,15*60*1000);
+loadAll();setInterval(loadAll,15*60*1000);
 
 /* ---------- Sparkline: progressive draw ---------- */
 var sparkData=[351.5,354.2,352.8,357.1,360.4,358.9,361.1,365.9,368.2,366.7,371.3,375.0,373.6,378.9,381.2,379.8,385.4,383.1,388.1,390.7];
@@ -359,13 +355,13 @@ function drawSpark(prog){
   function Y(v){return H-24-(v-min)*(H-48)/(max-min)}
   ctx.clearRect(0,0,W,H);
   var n=Math.max(2,Math.floor(sparkData.length*prog));
-  ctx.strokeStyle='#e0566e';ctx.lineWidth=4;ctx.lineJoin='round';ctx.beginPath();
+  ctx.strokeStyle=lineCol;ctx.lineWidth=4;ctx.lineJoin='round';ctx.beginPath();
   for(var i=0;i<n;i++){i?ctx.lineTo(X(i),Y(sparkData[i])):ctx.moveTo(X(i),Y(sparkData[i]));}
   ctx.stroke();
   var g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'rgba(224,86,110,.4)');g.addColorStop(1,'rgba(224,86,110,0)');
+  g.addColorStop(0,fillTop);g.addColorStop(1,fillBot);
   ctx.lineTo(X(n-1),H);ctx.lineTo(X(0),H);ctx.closePath();ctx.fillStyle=g;ctx.fill();
-  ctx.beginPath();ctx.arc(X(n-1),Y(sparkData[n-1]),8,0,7);ctx.fillStyle='#e0566e';ctx.fill();
+  ctx.beginPath();ctx.arc(X(n-1),Y(sparkData[n-1]),8,0,7);ctx.fillStyle=lineCol;ctx.fill();
   ctx.fillStyle='#9a9aa8';ctx.font='22px sans-serif';ctx.fillText('~30-day trend',12,30);
 }
 function animateSpark(){
@@ -376,24 +372,27 @@ function animateSpark(){
 
 /* ---------- News cycler ---------- */
 var NEWS=[
-  {h:'Jefferies lifts its Marriott price target to $429, Goldman Sachs to $406, ahead of Q3 earnings on Nov 2',s:'Analyst roundup · Oct 17, 2026'},
-  {h:'Eight hotels and 700+ rooms in the Netherlands are joining the Marriott portfolio',s:'Company announcement · Oct 2026'},
-  {h:'The Rise of Place: Marriott unveils its Future of Food 2027 report for Asia Pacific',s:'PR Newswire · Oct 6, 2026'},
-  {h:'Marriott stock gained 1.33% in the latest quoted session',s:'Market coverage · Oct 2026'}
+  {h:'Jefferies lifts its Marriott price target to $429, Goldman Sachs to $406, ahead of Q3 earnings on Nov 2',s:'Analyst roundup · Oct 17, 2026',img:'https://www.marketbeat.com/logos/marriott-international-inc-logo.png?v=20200227112206'},
+  {h:'Eight hotels and 700+ rooms in the Netherlands are joining the Marriott portfolio',s:'Company announcement · Oct 2026',img:'https://i.ytimg.com/vi/YEYQYlHO5EY/hqdefault.jpg'},
+  {h:'The Rise of Place: Marriott unveils its Future of Food 2027 report for Asia Pacific',s:'PR Newswire · Oct 6, 2026',img:'https://aapnews.imgdeliver.net/article/lead_image/228199/20261004231444EDT_image_1.jpg?width=800'},
+  {h:'Marriott stock gained 1.33% in the latest quoted session',s:'Market coverage · Oct 2026',img:'https://mdb.ad-hoc-news.de/bild/bild-2698314_1920_1080.webp'}
 ];
 var newsIdx=0,newsTimer=null;
 var dotsEl=document.getElementById('newsDots');
 NEWS.forEach(function(){var d=document.createElement('div');d.className='dot';dotsEl.appendChild(d);});
+NEWS.forEach(function(n){if(n.img){var im=new Image();im.src=n.img;}});
 function showNews(i){
-  var big=document.getElementById('newsBig'),src=document.getElementById('newsSrc');
-  big.style.opacity=0;src.style.opacity=0;
+  var big=document.getElementById('newsBig'),src=document.getElementById('newsSrc'),img=document.getElementById('newsImg');
+  big.style.opacity=0;src.style.opacity=0;img.style.opacity=0;
   setTimeout(function(){
     big.textContent=NEWS[i].h;src.textContent=NEWS[i].s;
-    big.style.opacity=1;src.style.opacity=1;
+    if(NEWS[i].img){img.style.display='block';img.src=NEWS[i].img;}else{img.style.display='none';}
+    big.style.opacity=1;src.style.opacity=1;img.style.opacity=1;
     var dots=dotsEl.children;for(var j=0;j<dots.length;j++)dots[j].className='dot'+(j===i?' on':'');
   },600);
 }
 function newsCycle(){showNews(newsIdx);newsIdx=(newsIdx+1)%NEWS.length;}
+document.getElementById('newsImg').addEventListener('error',function(){this.style.opacity=0;});
 newsCycle();
 
 /* ---------- Video ----------
