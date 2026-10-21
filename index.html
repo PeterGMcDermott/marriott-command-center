@@ -573,26 +573,28 @@ function stopSpotlight(){clearInterval(spotTimer);if(spotRAF)cancelAnimationFram
    "Pick" = best in/near the city core. "Lowest" = cheapest all-in in the metro,
    with its distance stated so a suburban floor price never masquerades as in-town. */
 var WEEKEND_RATES={
-  checked:'Tue Oct 20, 2026',
+  checked:'Wed Oct 21, 2026',
   dates:'Fri Oct 23 \u2013 Sun Oct 25, 2026',
   cities:[
     {city:'NASHVILLE', tag:'Home base', map:'assets/map-nashville.jpg',
      pick:{prop:'Sheraton Nashville Brentwood', area:'Brentwood \u00B7 8.4 mi to downtown', price:'$141/night \u00B7 $335 all-in'},
-     low:'Lowest in metro: Fairfield Smyrna \u2014 $123/night \u00B7 $288 all-in \u00B7 breakfast incl.',
-     note:'Downtown is pricey this weekend \u2014 from $477/night pre-tax.'},
+     low:'Lowest in metro: Fairfield Smyrna \u2014 $123/night \u00B7 $288 all-in \u00B7 17.4 mi \u00B7 breakfast incl.',
+     note:'Downtown pricey \u2014 cheapest in-town $392/night pre-tax (TownePlace Capitol District).'},
     {city:'GATLINBURG', tag:'4 hr drive \u00B7 Smokies', map:'assets/map-gatlinburg.jpg',
-     pick:{prop:'Courtyard Gatlinburg Downtown', area:'In town \u00B7 0.6 mi', price:'$231/night \u00B7 $522 all-in'},
-     low:'Lowest: Fairfield Sevierville Kodak \u2014 $149/night \u00B7 $336 all-in \u00B7 19.6 mi out \u00B7 breakfast incl.'},
+     pick:{prop:'Fairfield Gatlinburg Downtown', area:'In town \u00B7 0.8 mi', price:'$231/night \u00B7 $522 all-in'},
+     low:'Lowest in cluster: Fairfield Sevierville Kodak \u2014 $149/night \u00B7 $336 all-in \u00B7 19.6 mi \u00B7 breakfast incl.'},
     {city:'CHATTANOOGA', tag:'2 hr drive', map:'assets/map-chattanooga.jpg',
-     pick:{prop:'Element Chattanooga East', area:'Hamilton Place \u00B7 8.5 mi', price:'$183/night \u00B7 $429 all-in'},
-     low:'Next: Fairfield Chattanooga South/East Ridge \u2014 $186/night \u00B7 $437 all-in \u00B7 breakfast incl.',
-     note:'Downtown proper from $344/night pre-tax (Courtyard Downtown).'},
+     pick:{prop:'Residence Inn Chattanooga Downtown', area:'Downtown \u00B7 0.6 mi', price:'$355/night \u00B7 $833 all-in'},
+     low:'Lowest in town: Residence Inn Hamilton Place \u2014 $179/night \u00B7 $420 all-in \u00B7 8.5 mi east.',
+     note:'Downtown pricey this weekend \u2014 cheapest downtown $344/night pre-tax (Courtyard).'},
     {city:'ATLANTA', tag:'4.5 hr drive', steal:true, map:'assets/map-atlanta.jpg',
-     pick:{prop:'The Ritz-Carlton, Atlanta', area:'Downtown \u00B7 0.6 mi', price:'$280/night \u00B7 $671 all-in'},
-     low:'Lowest: Fairfield Atlanta Suwanee \u2014 $45/night \u00B7 $111 all-in for the weekend \u00B7 NE suburbs.'},
+     pick:{prop:'Residence Inn Atlanta Downtown', area:'Downtown \u00B7 0.5 mi', price:'$205/night \u00B7 $490 all-in'},
+     low:'Lowest: Fairfield Atlanta Marietta \u2014 $45/night \u00B7 $118 all-in \u00B7 13 mi NW \u00B7 breakfast incl.',
+     note:'Downtown cheap this weekend \u2014 Westin Peachtree Plaza $109/night.'},
     {city:'CHICAGO', tag:'1.5 hr flight', steal:true, map:'assets/map-chicago.jpg',
-     pick:{prop:'The Midland Hotel \u00B7 Tribute Portfolio', area:'The Loop \u00B7 0.3 mi', price:'$104/night pre-tax'},
-     low:'Lowest: Fairfield Chicago Lombard \u2014 $45/night \u00B7 $99 all-in \u00B7 20.7 mi \u00B7 breakfast incl.'}
+     pick:{prop:'Residence Inn Chicago Downtown/Loop', area:'The Loop \u00B7 0.1 mi', price:'$79/night \u00B7 $193 all-in'},
+     low:'Lowest: TownePlace Chicago Lombard \u2014 $45/night \u00B7 $105 all-in \u00B7 19.4 mi \u00B7 breakfast incl.',
+     note:'Downtown a bargain \u2014 4.5\u2605 Loop stay under $80/night.'}
   ]
 };
 (function renderRates(){
