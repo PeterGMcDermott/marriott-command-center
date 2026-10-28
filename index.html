@@ -573,28 +573,29 @@ function stopSpotlight(){clearInterval(spotTimer);if(spotRAF)cancelAnimationFram
    "Pick" = best in/near the city core. "Lowest" = cheapest all-in in the metro,
    with its distance stated so a suburban floor price never masquerades as in-town. */
 var WEEKEND_RATES={
-  checked:'Wed Oct 21, 2026',
-  dates:'Fri Oct 23 \u2013 Sun Oct 25, 2026',
+  checked:'Wed Oct 28, 2026',
+  dates:'Fri Oct 30 \u2013 Sun Nov 1, 2026',
   cities:[
-    {city:'NASHVILLE', tag:'Home base', map:'assets/map-nashville.jpg',
-     pick:{prop:'Sheraton Nashville Brentwood', area:'Brentwood \u00B7 8.4 mi to downtown', price:'$141/night \u00B7 $335 all-in'},
-     low:'Lowest in metro: Fairfield Smyrna \u2014 $123/night \u00B7 $288 all-in \u00B7 17.4 mi \u00B7 breakfast incl.',
-     note:'Downtown pricey \u2014 cheapest in-town $392/night pre-tax (TownePlace Capitol District).'},
+    {city:'NASHVILLE', tag:'Home base', steal:true, map:'assets/map-nashville.jpg',
+     pick:{prop:'TownePlace Suites Nashville Downtown/Capitol District', area:'Downtown \u00B7 0.4 mi', price:'$79/night \u00B7 $182 all-in'},
+     low:'Lowest in metro: Fairfield Nashville Airport \u2014 $45/night \u00B7 $110 all-in \u00B7 6 mi out.',
+     note:'Downtown cheap this weekend \u2014 AC Hotel Downtown $67/night.'},
     {city:'GATLINBURG', tag:'4 hr drive \u00B7 Smokies', map:'assets/map-gatlinburg.jpg',
-     pick:{prop:'Fairfield Gatlinburg Downtown', area:'In town \u00B7 0.8 mi', price:'$231/night \u00B7 $522 all-in'},
-     low:'Lowest in cluster: Fairfield Sevierville Kodak \u2014 $149/night \u00B7 $336 all-in \u00B7 19.6 mi \u00B7 breakfast incl.'},
-    {city:'CHATTANOOGA', tag:'2 hr drive', map:'assets/map-chattanooga.jpg',
-     pick:{prop:'Residence Inn Chattanooga Downtown', area:'Downtown \u00B7 0.6 mi', price:'$355/night \u00B7 $833 all-in'},
-     low:'Lowest in town: Residence Inn Hamilton Place \u2014 $179/night \u00B7 $420 all-in \u00B7 8.5 mi east.',
-     note:'Downtown pricey this weekend \u2014 cheapest downtown $344/night pre-tax (Courtyard).'},
+     pick:{prop:'Fairfield Gatlinburg Downtown', area:'In town \u00B7 0.8 mi', price:'$164/night \u00B7 $370 all-in'},
+     low:'Cheapest in 50-mi search: StudioRes Oak Ridge \u2014 $35/night \u00B7 $80 all-in \u00B7 45.8 mi out \u2014 not a Gatlinburg stay.',
+     note:'Only two downtown options: Courtyard Gatlinburg Downtown $171/night.'},
+    {city:'CHATTANOOGA', tag:'2 hr drive', steal:true, map:'assets/map-chattanooga.jpg',
+     pick:{prop:'SpringHill Suites Chattanooga Downtown/Cameron Harbor', area:'Downtown riverfront \u00B7 0.9 mi', price:'$123/night \u00B7 $288 all-in'},
+     low:'Lowest in metro: TownePlace Hixson \u2014 $45/night \u00B7 $105 all-in \u00B7 6.8 mi suburban.',
+     note:'Downtown unusually cheap \u2014 Moxy and Courtyard Downtown $57/night.'},
     {city:'ATLANTA', tag:'4.5 hr drive', steal:true, map:'assets/map-atlanta.jpg',
-     pick:{prop:'Residence Inn Atlanta Downtown', area:'Downtown \u00B7 0.5 mi', price:'$205/night \u00B7 $490 all-in'},
-     low:'Lowest: Fairfield Atlanta Marietta \u2014 $45/night \u00B7 $118 all-in \u00B7 13 mi NW \u00B7 breakfast incl.',
-     note:'Downtown cheap this weekend \u2014 Westin Peachtree Plaza $109/night.'},
+     pick:{prop:'Residence Inn Atlanta Downtown', area:'Downtown \u00B7 0.5 mi', price:'$198/night \u00B7 $472 all-in'},
+     low:'Lowest: Fairfield Atlanta Lithia Springs \u2014 $45/night \u00B7 $113 all-in \u00B7 12.3 mi W suburbs.',
+     note:'Downtown pricey vs the other cities \u2014 cheapest downtown is Glenn Hotel $104/night.'},
     {city:'CHICAGO', tag:'1.5 hr flight', steal:true, map:'assets/map-chicago.jpg',
-     pick:{prop:'Residence Inn Chicago Downtown/Loop', area:'The Loop \u00B7 0.1 mi', price:'$79/night \u00B7 $193 all-in'},
-     low:'Lowest: TownePlace Chicago Lombard \u2014 $45/night \u00B7 $105 all-in \u00B7 19.4 mi \u00B7 breakfast incl.',
-     note:'Downtown a bargain \u2014 4.5\u2605 Loop stay under $80/night.'}
+     pick:{prop:'Residence Inn Chicago Downtown/Loop', area:'The Loop \u00B7 0.1 mi', price:'$109/night \u00B7 $265 all-in'},
+     low:'Cheapest in 50-mi search: Elgin Inn \u2014 $39/night \u00B7 $88 all-in \u00B7 36.1 mi out \u2014 not a Chicago stay.',
+     note:'Loop bargain \u2014 LaSalle Chicago (Autograph) $104/night.'}
   ]
 };
 (function renderRates(){
