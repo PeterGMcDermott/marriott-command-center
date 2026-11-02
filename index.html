@@ -469,37 +469,37 @@ function animateSpark(){
 /* ---------- Brand spotlight: expanded tile ----------
    Top third = animated 90-day price chart for one brand.
    Below = 3 headlines for that brand. Cycles all 6 brands, 12s each.
-   Headlines curated Oct 20, 2026 from company / market coverage. */
+   Headlines curated Nov 2, 2026 from company / market coverage. */
 var BRAND_NEWS={
   'MAR':[
-    {h:'Freedom Broker initiates coverage with a Buy rating and a $408 price target',s:'MarketBeat \u00B7 Oct 15, 2026'},
-    {h:'Eight hotels and 700+ rooms in the Netherlands to join \u2014 six for Series by Marriott, two for Tribute Portfolio',s:'Company announcement \u00B7 Oct 5, 2026'},
-    {h:'First City Express in South Asia opens in Udaipur, alongside the first Marriott Hotels property in Jakarta',s:'Expansion \u00B7 Oct 2026'}
+    {h:'Q3 RevPAR up 6.5% worldwide, 7.4% in the U.S. & Canada; adjusted EPS of $3.02',s:'Company announcement \u00B7 Nov 2, 2026'},
+    {h:'Full-year RevPAR outlook raised to 4.5-5.0%; Q3 adjusted EBITDA up 12% to $1.51B',s:'Company announcement \u00B7 Nov 2, 2026'},
+    {h:'System tops 10,200 properties and 1.83M rooms after adding about 20,100 net rooms in the quarter',s:'Company announcement \u00B7 Nov 2, 2026'}
   ],
   'HLT':[
-    {h:'Hilton signs two Bengaluru airport hotels \u2014 600 rooms and a second Conrad for the city, opening 2030',s:'Company announcement \u00B7 Oct 6, 2026'},
-    {h:'Q3 results land Oct 27 \u2014 analysts expect $2.36 a share on $3.37B in revenue',s:'Earnings preview \u00B7 Oct 20, 2026'},
-    {h:'Morgan Stanley lifts its target to $336; former Uber engineering chief Jeff Moore joins as CTO on Oct 26',s:'Analysts & leadership \u00B7 Oct 2026'}
+    {h:'Q3 beat: adjusted EPS of $2.45 topped the ~$2.35 consensus; revenue up 6.6% to $3.33B',s:'Zacks \u00B7 Oct 27, 2026'},
+    {h:'System-wide RevPAR grew 5.8%, and Hilton raised its full-year RevPAR outlook to 4-4.5%',s:'Company announcement \u00B7 Oct 27, 2026'},
+    {h:'Pipeline hit a record 543,100 rooms; net unit growth 6.0% year over year',s:'Company announcement \u00B7 Oct 27, 2026'}
   ],
   'IHG':[
-    {h:'Hotel Indigo opens its 200th hotel, a milestone for IHG\u2019s luxury and lifestyle brand',s:'LODGING Magazine \u00B7 Oct 5, 2026'},
-    {h:'First-half RevPAR grew 4.1%, adjusted EPS rose 13% and net system growth hit 5.0%',s:'H1 2026 results \u00B7 Aug 2026'},
-    {h:'Q3 trading update due Oct 22, with the buyback still running \u2014 19,581 shares repurchased on Oct 14',s:'Market coverage \u00B7 Oct 2026'}
+    {h:'Q3 global RevPAR up 5.3%, beating the 4.4% consensus; the Americas grew 6.8%, the US 6.9%',s:'Reuters \u00B7 Oct 22, 2026'},
+    {h:'Confident of hitting full-year consensus, with adjusted EPS growth near the top end of its 12-15% annual target range',s:'Company trading update \u00B7 Oct 22, 2026'},
+    {h:'1,000th hotel opened in Europe; $707M of the $950M buyback now complete',s:'CoStar \u00B7 Oct 22, 2026'}
   ],
   'H':[
-    {h:'Pipeline tops 154,000 rooms, with 300+ U.S. submarkets targeted and 70+ Hyatt Studios hotels in development',s:'Development update \u00B7 Oct 6, 2026'},
-    {h:'Q3 results due before the open on Oct 29 \u2014 Q2 EPS of $1.12 beat the $0.91 consensus',s:'Earnings preview \u00B7 Oct 2026'},
-    {h:'World of Hyatt swaps its new-hotel bonus for 2X points on eligible spend, capped at 25,000 points per stay',s:'Loyalty \u00B7 Oct 1, 2026'}
+    {h:'Q3 beat: adjusted EPS of $1.27 topped the $0.69 consensus; revenue $1.743B',s:'Company results \u00B7 Oct 29, 2026'},
+    {h:'Comparable system-wide RevPAR rose 7.2%, with US RevPAR up 8.2%; full-year RevPAR outlook raised to 5.0-5.5%',s:'Company results \u00B7 Oct 29, 2026'},
+    {h:'Gross fees up 15.2% to $327M; pipeline about 158,000 rooms, up 12.1% year over year',s:'Company results \u00B7 Oct 29, 2026'}
   ],
   'WH':[
-    {h:'Q3 results due after the close on Oct 21 \u2014 consensus sits near $1.31 a share',s:'Earnings preview \u00B7 Oct 20, 2026'},
-    {h:'Zacks expects Q3 earnings to dip 10.3% year over year, even as revenue rises 7.6% to about $411M',s:'Zacks \u00B7 Oct 14, 2026'},
-    {h:'Q2 beat in July: $1.48 a share against a $1.41 consensus, from one of the world\u2019s largest hotel franchisors',s:'Q2 2026 results \u00B7 Jul 2026'}
+    {h:'Q3 beat: adjusted EPS of $1.43 topped the $1.32 consensus; revenue up 7.3% to $410M',s:'Zacks \u00B7 Oct 21, 2026'},
+    {h:'US RevPAR grew 6%, and Wyndham raised the lower ends of its full-year RevPAR, EBITDA and EPS outlook',s:'Company announcement \u00B7 Oct 21, 2026'},
+    {h:'$100M of free cash flow in the quarter; shares rose after the results',s:'Market coverage \u00B7 Oct 21, 2026'}
   ],
   'CHH':[
-    {h:'Choice to acquire Harvest Hosts for $130M \u2014 11,200+ RV host sites at wineries, farms and breweries',s:'PR Newswire \u00B7 Sep 30, 2026'},
-    {h:'Q2 adjusted EPS of $2.02 beat consensus; full-year EBITDA outlook raised to $635M\u2013$650M',s:'Q2 2026 results \u00B7 Aug 2026'},
-    {h:'Choice Privileges membership up 7% to 77 million; U.S. openings rose 27% and franchise signings 30% in Q2',s:'Q2 2026 results \u00B7 Aug 2026'}
+    {h:'Q3 adjusted EPS of $2.33 topped consensus; revenue up 2.5% to $458M',s:'Company announcement \u00B7 Nov 2, 2026'},
+    {h:'U.S. RevPAR up 3.8% in Q3; full-year adjusted EPS outlook raised to $6.92\u2013$7.07',s:'Company announcement \u00B7 Nov 2, 2026'},
+    {h:'Global net rooms grew 1.7%; two owned hotels sold after quarter-end for about $34M, keeping franchise agreements',s:'Company announcement \u00B7 Nov 2, 2026'}
   ]
 };
 var spotCur=0, spotTimer=null, spotRAF=null;
@@ -559,7 +559,7 @@ function renderSpotlight(idx){
     +'<div class="spot-stats">'+statsHtml+'</div></div>'
     +'<div class="spot-news"><div class="kicker">Latest on '+p.n+'</div>'+cards
     +'<div class="spot-foot"><div class="spot-progress"><div class="spot-progress-bar"></div></div><div class="spot-dots">'+dots+'</div>'
-    +'<div class="tiny" style="text-align:center;margin-top:8px">Headlines curated Oct 20, 2026 \u00B7 Prices via Yahoo Finance, baked Oct 19 close as fallback</div></div></div>';
+    +'<div class="tiny" style="text-align:center;margin-top:8px">Headlines curated Nov 2, 2026 \u00B7 Prices via Yahoo Finance, baked Oct 19 close as fallback</div></div></div>';
   animateSpotChart();
 }
 function goSpot(i){renderSpotlight(i);}
