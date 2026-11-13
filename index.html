@@ -176,7 +176,7 @@
     #sv-hero{display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:auto auto 1fr;column-gap:32px}
     #sv-hero .price{grid-column:1;grid-row:1;font-size:118px}
     #sv-hero .chgwrap{grid-column:1;grid-row:2}
-    #sv-hero #spark{grid-column:1;grid-row:3;height:210px;margin-top:12px}
+    #sv-hero #spark{grid-column:1;grid-row:3;height:250px;margin-top:12px}
     #sv-hero .grid{grid-column:2;grid-row:1/4;margin-top:0;align-content:center}
     .chg{font-size:28px;margin-top:12px;padding:8px 18px}
     .stat .k{font-size:15px}
@@ -212,17 +212,17 @@
     .hl-s{font-size:15px}
 
     /* Rates: 3 + 2 grid, map on top of each card */
-    .explore-title{font-size:60px}
+    .explore-title{font-size:52px}
     .explore-sub{font-size:19px;margin-top:10px}
-    .explore-sub2{font-size:16px;margin:4px 0 16px}
-    #ratesList{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .rate-card{flex-direction:column;gap:10px;padding:14px}
-    .rate-map{width:100%;height:110px}
+    .explore-sub2{font-size:16px;margin:4px 0 14px}
+    #ratesList{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .rate-card{flex-direction:column;gap:8px;padding:12px}
+    .rate-map{width:100%;height:84px}
     .rate-city{font-size:26px}
     .rate-tag{font-size:14px}
     .rate-steal{font-size:14px}
-    .rate-pick{font-size:19px;margin-top:4px}
-    .rate-low{font-size:16px}
+    .rate-pick{font-size:18px;margin-top:4px}
+    .rate-low{font-size:15px}
     .rate-note{font-size:14px}
     .rates-foot{font-size:13px;padding-top:10px}
 
@@ -233,6 +233,10 @@
     #newsBig{grid-column:2;grid-row:2;font-size:46px}
     #newsSrc{grid-column:2;grid-row:3;font-size:19px;margin-top:12px}
     #newsDots{grid-column:2;grid-row:4}
+    /* Live feed items have no image: headline takes the full width */
+    #scene-news.noimg #newsBig{grid-column:1/3;font-size:54px}
+    #scene-news.noimg #newsSrc{grid-column:1/3}
+    #scene-news.noimg #newsDots{grid-column:1/3}
 
     /* Ticker + controls: slimmer */
     #tape{padding:10px 0}
@@ -720,6 +724,7 @@ function showNews(i){
   setTimeout(function(){
     big.textContent=NEWS[i].h;src.textContent=NEWS[i].s;
     if(NEWS[i].img){img.style.display='block';img.src=NEWS[i].img;}else{img.style.display='none';}
+    document.getElementById('scene-news').classList.toggle('noimg',!NEWS[i].img);
     big.style.opacity=1;src.style.opacity=1;img.style.opacity=1;
     var dots=dotsEl.children;for(var j=0;j<dots.length;j++)dots[j].className='dot'+(j===i?' on':'');
   },600);
