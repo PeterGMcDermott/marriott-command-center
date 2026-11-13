@@ -76,6 +76,7 @@
   .srcNote{font-size:17px;color:var(--dim);margin-top:auto;padding-top:18px}
 
   /* Brand spotlight (expanded tile) */
+  .spot-body{display:flex;flex-direction:column;height:100%;min-height:0}
   #scene-spotlight .spot-top{flex:0 0 33%;display:flex;flex-direction:column;min-height:0;border-bottom:1px solid var(--line);padding-bottom:18px}
   .spot-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
   .spot-tk{font-size:19px;letter-spacing:4px;font-weight:700;text-transform:uppercase}
@@ -158,6 +159,88 @@
   #controls button{background:var(--panel3);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:14px 26px;font-size:20px;font-weight:600;cursor:pointer}
   #controls button.active{background:var(--coral);border-color:var(--coral);color:#141414}
   .hint{text-align:center;font-size:17px;color:var(--dim);padding-bottom:14px;background:var(--panel)}
+
+  /* ===== 16:9 landscape: same page, re-laid for a wide screen ===== */
+  @media (orientation: landscape){
+    body{max-width:none}
+    header.top{padding:14px 32px 12px}
+    .brandlogo{height:46px}
+    #clock .t{font-size:32px}
+    #clock .d{font-size:16px}
+    .scene{padding:24px 32px}
+    .kicker{font-size:16px;letter-spacing:3px;margin-bottom:12px}
+    .kicker::before{width:40px;height:3px;margin-bottom:10px}
+    .tiny{font-size:15px}
+
+    /* Stock hero: price + spark left, stats right */
+    #sv-hero{display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:auto auto 1fr;column-gap:32px}
+    #sv-hero .price{grid-column:1;grid-row:1;font-size:118px}
+    #sv-hero .chgwrap{grid-column:1;grid-row:2}
+    #sv-hero #spark{grid-column:1;grid-row:3;height:210px;margin-top:12px}
+    #sv-hero .grid{grid-column:2;grid-row:1/4;margin-top:0;align-content:center}
+    .chg{font-size:28px;margin-top:12px;padding:8px 18px}
+    .stat .k{font-size:15px}
+    .stat .v{font-size:30px}
+    .charttitle{font-size:30px}
+    .chartstats{font-size:20px}
+    .srcNote{font-size:14px}
+    .subdots{padding:8px 0}
+
+    /* Hospitality tiles: 3 across */
+    .tilegrid{grid-template-columns:repeat(3,1fr)}
+    .tile-logo{height:48px;min-width:96px}
+    .tile-logo img{max-height:32px;max-width:130px}
+    .tile .tk{font-size:24px}
+    .tile .nm{font-size:16px}
+    .tile .pv{font-size:34px}
+    .tile .cg{font-size:19px}
+    .tile canvas{height:64px}
+
+    /* Spotlight: chart left, headlines right */
+    .spot-body{flex-direction:row}
+    #scene-spotlight .spot-top{flex:1.1;border-bottom:none;border-right:1px solid var(--line);padding-bottom:0;padding-right:24px;min-width:0}
+    .spot-news{padding-top:0;padding-left:24px}
+    .spot-name{font-size:40px}
+    .spot-price{font-size:76px}
+    .spot-chg{font-size:20px}
+    .spot-stats{font-size:18px}
+    .tile-logo.spot-logo{height:64px;min-width:140px}
+    .tile-logo.spot-logo img{max-height:40px;max-width:190px}
+    .hl-card{padding:16px 18px;margin-bottom:12px}
+    .hl-num{font-size:30px}
+    .hl-h{font-size:27px}
+    .hl-s{font-size:15px}
+
+    /* Rates: 3 + 2 grid, map on top of each card */
+    .explore-title{font-size:60px}
+    .explore-sub{font-size:19px;margin-top:10px}
+    .explore-sub2{font-size:16px;margin:4px 0 16px}
+    #ratesList{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .rate-card{flex-direction:column;gap:10px;padding:14px}
+    .rate-map{width:100%;height:110px}
+    .rate-city{font-size:26px}
+    .rate-tag{font-size:14px}
+    .rate-steal{font-size:14px}
+    .rate-pick{font-size:19px;margin-top:4px}
+    .rate-low{font-size:16px}
+    .rate-note{font-size:14px}
+    .rates-foot{font-size:13px;padding-top:10px}
+
+    /* News: image left, headline right */
+    #scene-news{display:grid;grid-template-columns:42% 1fr;grid-template-rows:auto 1fr auto auto;column-gap:32px}
+    #scene-news .kicker{grid-column:1/3;grid-row:1}
+    #newsImg{grid-column:1;grid-row:2/5;height:100%;min-height:0;margin-bottom:0}
+    #newsBig{grid-column:2;grid-row:2;font-size:46px}
+    #newsSrc{grid-column:2;grid-row:3;font-size:19px;margin-top:12px}
+    #newsDots{grid-column:2;grid-row:4}
+
+    /* Ticker + controls: slimmer */
+    #tape{padding:10px 0}
+    #tapeInner span{font-size:22px;margin:0 30px}
+    #controls{padding:10px}
+    #controls button{padding:10px 20px;font-size:16px}
+    .hint{font-size:14px;padding-bottom:8px}
+  }
 </style>
 </head>
 <body>
@@ -175,7 +258,7 @@
     <div id="stockBody">
       <div class="subview on" id="sv-hero">
         <div class="price" id="price">$423.36</div>
-        <div><span class="chg down" id="chg">-$1.30 (-0.31%)</span></div>
+        <div class="chgwrap"><span class="chg down" id="chg">-$1.30 (-0.31%)</span></div>
         <canvas id="spark"></canvas>
         <div class="grid">
           <div class="stat"><div class="k">Open</div><div class="v" id="sOpen">428.41</div></div>
@@ -204,7 +287,7 @@
   
   <!-- SCENE 1B: BRAND SPOTLIGHT (expanded tile: chart top third + 3 headlines) -->
   <section class="scene" id="scene-spotlight">
-    <div id="spotBody" style="display:flex;flex-direction:column;height:100%;min-height:0"></div>
+    <div id="spotBody" class="spot-body"></div>
   </section>
 
   
