@@ -662,29 +662,29 @@ function stopSpotlight(){clearInterval(spotTimer);if(spotRAF)cancelAnimationFram
    "Pick" = best in/near the city core. "Lowest" = cheapest all-in in the metro,
    with its distance stated so a suburban floor price never masquerades as in-town. */
 var WEEKEND_RATES={
-  checked:'Wed Nov 18, 2026',
-  dates:'Fri Nov 20 \u2013 Sun Nov 22, 2026',
+  checked:'Wed Nov 25, 2026',
+  dates:'Fri Nov 27 \u2013 Sun Nov 29, 2026',
   cities:[
     {city:'NASHVILLE', tag:'Home base', steal:true, map:'assets/map-nashville.jpg',
-     pick:{prop:'TownePlace Suites Nashville Downtown/Capitol District', area:'Downtown \u00B7 0.4 mi', price:'$70/night \u00B7 $161 all-in'},
-     low:'Lowest in metro: Fairfield Inn & Suites Franklin Cool Springs \u2014 $38/night \u00B7 $90 all-in \u00B7 14 mi out.',
-     note:'Downtown split this weekend \u2014 Sheraton Grand $94/night and Renaissance $109/night at the cheap end, JW Marriott $619/night at the top.'},
-    {city:'GATLINBURG', tag:'4 hr drive \u00B7 Smokies', steal:true, map:'assets/map-gatlinburg.jpg',
-     pick:{prop:'Courtyard Gatlinburg Downtown', area:'In town \u00B7 0.6 mi', price:'$309/night \u00B7 $696 all-in'},
-     low:'Cheapest in 50-mi search: City Express Knoxville \u2014 $33/night \u00B7 $78 all-in \u00B7 31.8 mi out \u2014 not a Gatlinburg stay.',
-     note:'No MMA rate at the only in-town property this weekend \u2014 flexible rate only; Pigeon Forge cheapest nearby at $213/night (SpringHill Suites, 7.5 mi).'},
+     pick:{prop:'Fairfield Inn & Suites Nashville Near Vanderbilt', area:'Near Vanderbilt \u00B7 2.2 mi', price:'$45/night \u00B7 $110 all-in'},
+     low:'Lowest in metro: Fairfield Inn & Suites Nashville Smyrna \u2014 $45/night \u00B7 $105 all-in \u00B7 17.4 mi out.',
+     note:'Downtown cheap this weekend \u2014 best near-core stay $45/night; Aloft West End $48/night. (Cheapest rate shown under the MMA search, Explore More, is a separate promo \u2014 not an Associate rate \u2014 so it is not used here.)'},
+    {city:'GATLINBURG', tag:'4 hr drive \u00B7 Smokies', steal:false, map:'assets/map-gatlinburg.jpg',
+     pick:{prop:'Fairfield Inn & Suites Gatlinburg Downtown', area:'In town \u00B7 0.8 mi', price:'$228/night \u00B7 $514 all-in'},
+     low:'Cheapest in 50-mi search: City Express Knoxville \u2014 $39/night \u00B7 $92 all-in \u00B7 31.8 mi out \u2014 not a Gatlinburg stay.',
+     note:'In-town pricey this weekend \u2014 cheapest in Gatlinburg proper $228/night, and no flat $45 Associate rate is offered there; Pigeon Forge is $183/night (TownePlace Suites, 6.1 mi).'},
     {city:'CHATTANOOGA', tag:'2 hr drive', steal:true, map:'assets/map-chattanooga.jpg',
-     pick:{prop:'The Westin Chattanooga', area:'Downtown \u00B7 0.2 mi', price:'$79/night \u00B7 $185 all-in'},
-     low:'Lowest in metro: Fairfield Inn & Suites Chattanooga Hamilton Place \u2014 $38/night \u00B7 $89 all-in \u00B7 8.7 mi out.',
-     note:'Downtown luxury unusually cheap \u2014 Kinley $88/night, Chattanooga Marriott Downtown $106/night; the Westin pick is the 1-King room (2-Queen $385 all-in).'},
+     pick:{prop:'Courtyard Chattanooga Downtown', area:'Downtown \u00B7 0.6 mi', price:'$57/night \u00B7 $133 all-in'},
+     low:'Lowest in metro: Fairfield Inn & Suites Chattanooga Hamilton Place \u2014 $45/night \u00B7 $105 all-in \u00B7 8.7 mi out.',
+     note:'Downtown cheap this weekend \u2014 Moxy Downtown also $57/night (0.4 mi); Courtyard pick is the Explore Associate & Family rate.'},
     {city:'ATLANTA', tag:'4.5 hr drive', steal:true, map:'assets/map-atlanta.jpg',
-     pick:{prop:'Atlanta Marriott Marquis', area:'Downtown \u00B7 0.8 mi', price:'$104/night \u00B7 $259 all-in'},
-     low:'Lowest: StudioRes Newnan \u2014 $35/night \u00B7 $91 all-in \u00B7 32.5 mi SW suburbs.',
-     note:'Downtown cheap this weekend \u2014 Ellis Hotel $88/night, Westin Peachtree Plaza $109/night; Ritz-Carlton $449/night at the top.'},
+     pick:{prop:'SpringHill Suites Atlanta Downtown', area:'Downtown \u00B7 1.1 mi', price:'$57/night \u00B7 $143 all-in'},
+     low:'Lowest in metro: Fairfield Inn & Suites Atlanta Alpharetta \u2014 $45/night \u00B7 $114 all-in \u00B7 22 mi out.',
+     note:'Downtown cheap this weekend \u2014 Courtyard Downtown $57/night (0.6 mi) and Aloft Downtown $57/night (0.9 mi) on Associate rates.'},
     {city:'CHICAGO', tag:'1.5 hr flight', steal:true, map:'assets/map-chicago.jpg',
-     pick:{prop:'The Westin Chicago River North', area:'River North \u00B7 0.4 mi', price:'$139/night \u00B7 $336 all-in'},
-     low:'Cheapest in 50-mi search: Fairfield Inn & Suites Chicago Lombard \u2014 $38/night \u00B7 $84 all-in \u00B7 20.7 mi out.',
-     note:'Downtown pricey this weekend \u2014 Residence Inn Loop $268/night, Renaissance Downtown $279/night; cheapest central is THE MIDLAND HOTEL $104/night.'}
+     pick:{prop:'Hotel Chicago Downtown, Autograph Collection', area:'Downtown \u00B7 0.4 mi', price:'$129/night \u00B7 $306 all-in'},
+     low:'Cheapest in 50-mi search: Fairfield Inn & Suites Chicago O\u2019Hare \u2014 $45/night \u00B7 $102 all-in \u00B7 15.8 mi out.',
+     note:'Downtown pricey vs the other cities \u2014 cheapest downtown Associate rate $129/night; pick is a 1-Queen room (2-Queen is $281/night pre-tax), and Marriott Downtown Magnificent Mile is also $129/night.'}
   ]
 };
 (function renderRates(){
